@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import Column from '../values/column';
+import Position from '../values/position';
 import Section from '../values/section';
 import ColumnComponent from './Column.vue';
 
 const props = defineProps<{
   section: Section,
+  cursorPosition: Position,
+  isSelected: boolean
 }>();
 
 const emits = defineEmits<{
-  (e: 'sectionChanged', section: Section)
+  (e: 'sectionChanged', section: Section): void
+  (e: 'noteSelected', string: number, active: boolean, index: number): void
 }>();
 
 const onColumnChanged = (changedColumn: Column, changedColumnIndex?: number) => {
@@ -24,6 +28,10 @@ const onColumnChanged = (changedColumn: Column, changedColumnIndex?: number) => 
 
   emits('sectionChanged', section);
 }
+
+const onNoteSelected = (string: number, active: boolean, index: number) => {
+  emits('noteSelected', string, active, index);
+};
 </script>
 
 <template>
@@ -57,10 +65,10 @@ const onColumnChanged = (changedColumn: Column, changedColumnIndex?: number) => 
       </div>
 
       <div v-for="column, index in section.columns" :key="index">
-        <ColumnComponent @column-changed="column => onColumnChanged(column, index)" :column="column"/>
+        <ColumnComponent @note-selected="(string, active) => onNoteSelected(string, active, index)" @column-changed="column => onColumnChanged(column, index)" :is-selected="isSelected && cursorPosition.column === index" :cursor-position="cursorPosition" :column="column"/>
       </div>
 
-      <ColumnComponent @column-changed="onColumnChanged" />
+      <ColumnComponent @note-selected="(string, active) => onNoteSelected(string, active, section.columns.length)" @column-changed="onColumnChanged" :is-selected="isSelected && cursorPosition.column === section.columns.length" :cursor-position="cursorPosition" />
     </div>
   </div>
 </template>
