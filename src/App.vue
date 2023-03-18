@@ -17,6 +17,7 @@ onMounted(() => {
   document.addEventListener("keydown", (event: KeyboardEvent) => {
     cursor.value = cursor.value
       .moveCursorFromKeyboardEvent(event)
+      .moveCursorBetweenSections(tab.value)
       .moveCursorWithinSectionBounds(tab.value);
 
     // We stop this from happening so that using our cursor doesn't have

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import Column from '../values/column';
+import Cursor from '../values/cursor';
 import Note from '../values/note';
-import Position from '../values/position';
 import NoteComponent from './Note.vue';
 
 const props = defineProps<{
   column: Column,
   isSelected: boolean,
-  cursor: Position,
+  cursor: Cursor,
 }>();
 
 const emits = defineEmits<{
@@ -31,8 +31,8 @@ const onNoteSelected = (string: number, active: boolean) => {
         @note-selected="active => onNoteSelected(string, active)"
         @note-changed="fret => onNoteChanged(string, fret)"
         :width="column.getCharacterWidth()"
-        :is-selected="isSelected && cursor.string === string"
-        :cursor="cursor"
+        :is-selected="isSelected && cursor.isCurrentString(string)"
+        :is-active="cursor.isActive()"
         :note="column.getNoteForString(string)" />
     </div>
   </div>

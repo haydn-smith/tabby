@@ -56,10 +56,45 @@ export default class Cursor {
     public moveCursorWithinSectionBounds(tab: Tab): Cursor {
         return new Cursor(
             this.active,
-            this.section,
+            clamp(0, tab.sections.length - 1, this.section),
             clamp(0, tab.getSection(this.section).columns.length, this.column),
             clamp(1, tab.getSection(this.section).getTuning().length, this.string)
         );
+    }
+
+    public moveCursorBetweenSections(tab: Tab) {
+        const columnOffset = this.projectedSection(tab) === this.section ? 0 : -1;
+
+        return new Cursor(
+            this.active,
+            this.projectedSection(tab),
+            clamp(0, tab.getSection(this.projectedSection(tab)).columns.length + columnOffset, this.column),
+            this.projectedString(tab)
+        );
+    }
+
+    private projectedSection(tab: Tab): number {
+        if (this.section < tab.sections.length - 1 && this.string > tab.getSection(this.section).getTuning().length) {
+            return this.section + 1;
+        }
+
+        if (this.section > 0 && this.string < 1) {
+            return this.section - 1;
+        }
+
+        return this.section;
+    }
+
+    private projectedString(tab: Tab): number {
+        if (this.section < tab.sections.length - 1 && this.string > tab.getSection(this.section).getTuning().length) {
+            return 0;
+        }
+
+        if (this.section > 0 && this.string < 1) {
+            return tab.getSection(this.section - 1).getTuning().length;
+        }
+
+        return this.string;
     }
 
     public isCurrentSection(index: number): boolean {
@@ -68,6 +103,10 @@ export default class Cursor {
 
     public isCurrentColumn(index: number): boolean {
         return this.column === index;
+    }
+
+    public isCurrentString(string: number): boolean {
+        return this.string === string;
     }
 
     public currentString(): number {

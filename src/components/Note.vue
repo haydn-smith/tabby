@@ -7,7 +7,7 @@ const props = defineProps<{
   note: Note,
   width: number
   isSelected: boolean,
-  cursor: Cursor,
+  isActive: boolean,
 }>();
 
 const emits = defineEmits<{
@@ -30,10 +30,10 @@ const selectNote = (active: boolean) => {
   emits('noteSelected', active);
 };
 
-watch(() => props.cursor, async () => {
+watch(() => props.isActive, async () => {
   await nextTick();
 
-  if (props.isSelected && props.cursor.isActive()) {
+  if (props.isSelected && props.isActive) {
     inputRef.value?.focus();
   }
 });
@@ -42,6 +42,6 @@ watch(() => props.cursor, async () => {
 <template>
   <div @click="selectNote(true)" @keydown.enter="selectNote(true)" :class="{'bg-blue-300': isSelected}" class="cursor-pointer relative px-0 hover:bg-blue-200">
     <div>{{ note.paddedFret(width) }}-</div>
-    <input ref="inputRef" @blur="selectNote(false)" v-show="isSelected && cursor.isActive()" v-model="modelValue" class="z-50 text-center focus:ring-0 w-full absolute inset-0 p-0 m-0 bg-white w-4 border-none rounded-none"/>
+    <input ref="inputRef" @blur="selectNote(false)" v-show="isSelected && isActive" v-model="modelValue" class="z-50 text-center focus:ring-0 w-full absolute inset-0 p-0 m-0 bg-white w-4 border-none rounded-none"/>
   </div>
 </template>
