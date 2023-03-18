@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref, watch } from 'vue';
 import Note from '../values/note';
-import Position from '../values/position';
+import Cursor from '../values/cursor';
 
-const props = withDefaults(defineProps<{
-  note?: Note,
-  characterWidth?: number
+const props = defineProps<{
+  note: Note,
+  width: number
   isSelected: boolean,
-  cursorPosition: Position,
-}>(), {
-  characterWidth: 1
-});
+  cursor: Cursor,
+}>();
 
 const emits = defineEmits<{
   (e: 'noteChanged', fret: string): void
@@ -21,51 +19,29 @@ const inputRef = ref<HTMLInputElement|null>(null);
 const modelValue = ref('');
 
 onMounted(() => {
-  if (props.note) {
-    modelValue.value = props.note.fret;
-  }
+  modelValue.value = props.note.fret;
 });
 
-const focusInput = () => {
-  emits('noteSelected', true);
-};
-
-const blurInput = () => {
-  addNote();
-  emits('noteSelected', false);
-};
-
-const addNote = () => {
-  if (props.note || modelValue.value.length) {
+const selectNote = (active: boolean) => {
+  if (!active) {
     emits('noteChanged', modelValue.value);
   }
 
-  if (!props.note) {
-    modelValue.value = '';
-  }
-}
+  emits('noteSelected', active);
+};
 
-const pad = (str: string = '') => {
-  while (str.length < props.characterWidth) {
-    str += '-';
-  }
-
-  return str;
-}
-
-watch(props.cursorPosition, async () => {
+watch(() => props.cursor, async () => {
   await nextTick();
 
-  if (props.isSelected && props.cursorPosition.active) {
-    inputRef.value.focus();
+  if (props.isSelected && props.cursor.isActive()) {
+    inputRef.value?.focus();
   }
 });
 </script>
 
 <template>
-  <div @click="focusInput()" @keydown.enter="focusInput" :class="{'bg-blue-300': isSelected}" class="cursor-pointer relative px-0 hover:bg-blue-200">
-    <div v-if="note">{{ pad(String(note.fret)) }}-</div>
-    <div v-else>{{ pad() }}-</div>
-    <input ref="inputRef" @blur="blurInput" v-show="isSelected && cursorPosition.active" v-model="modelValue" type="text" class="z-50 text-center focus:ring-0 w-full absolute inset-0 p-0 m-0 bg-white w-4 border-none rounded-none"/>
+  <div @click="selectNote(true)" @keydown.enter="selectNote(true)" :class="{'bg-blue-300': isSelected}" class="cursor-pointer relative px-0 hover:bg-blue-200">
+    <div>{{ note.paddedFret(width) }}-</div>
+    <input ref="inputRef" @blur="selectNote(false)" v-show="isSelected && cursor.isActive()" v-model="modelValue" class="z-50 text-center focus:ring-0 w-full absolute inset-0 p-0 m-0 bg-white w-4 border-none rounded-none"/>
   </div>
 </template>

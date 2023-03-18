@@ -5,9 +5,9 @@ import Position from '../values/position';
 import NoteComponent from './Note.vue';
 
 const props = defineProps<{
-  column?: Column,
-  cursorPosition: Position,
-  isSelected: boolean
+  column: Column,
+  isSelected: boolean,
+  cursor: Position,
 }>();
 
 const emits = defineEmits<{
@@ -15,20 +15,8 @@ const emits = defineEmits<{
   (e: 'noteSelected', string: number, active: boolean): void
 }>();
 
-const onNoteChanged = (fret: string, string: number) => {
-  const column = new Column();
-
-  if (props.column) {
-    column.notes = props.column.notes.map((note) => {
-      return (note.string === string) ? new Note(string, fret) : note;
-    });
-  }
-
-  if (! column.notes.filter(note => note.string === string).length) {
-    column.notes.push(new Note(string, fret));
-  }
-
-  emits('columnChanged', column);
+const onNoteChanged = (string: number, fret: string) => {
+  emits('columnChanged', props.column.setNote(string, fret));
 };
 
 const onNoteSelected = (string: number, active: boolean) => {
@@ -38,8 +26,14 @@ const onNoteSelected = (string: number, active: boolean) => {
 
 <template>
   <div :class="{'text-blue-400': !column, 'bg-blue-100': isSelected}">
-    <div v-for="string in [1, 2, 3, 4, 5, 6]" :key="string">
-      <NoteComponent @note-selected="active => onNoteSelected(string, active)" :character-width="column ? column.getMaxCharacterWidth() : 1" :is-selected="isSelected && cursorPosition.string === string" :cursor-position="cursorPosition" :note="column ? column.getNoteAtString(string) : undefined" @noteChanged="fret => onNoteChanged(fret, string)"/>
+    <div v-for="string in column.getStrings()" :key="string">
+      <NoteComponent
+        @note-selected="active => onNoteSelected(string, active)"
+        @note-changed="fret => onNoteChanged(string, fret)"
+        :width="column.getCharacterWidth()"
+        :is-selected="isSelected && cursor.string === string"
+        :cursor="cursor"
+        :note="column.getNoteForString(string)" />
     </div>
   </div>
 </template>

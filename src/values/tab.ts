@@ -14,7 +14,37 @@ export default class Tab {
         this.arrangement = new Arrangement();
     }
 
-    public addSection() {
-        this.sections.push(new Section());
+    public static makeFromTab(tab: Tab): Tab {
+        const newTab = new Tab();
+
+        newTab.sections = tab.sections.map(section => Section.makeFromSection(section));
+
+        return newTab;
+    }
+
+    public getSection(index: number): Section {
+        if (this.sections[index] === undefined) {
+            throw new Error('Section does not exist!');
+        }
+
+        return this.sections[index];
+    }
+
+    public addSection(): Tab {
+        const tab = Tab.makeFromTab(this);
+
+        tab.sections.push(Section.make());
+
+        return tab;
+    }
+
+    public setSection(section: Section, sectionIndex: number): Tab {
+        const tab = Tab.makeFromTab(this);
+
+        tab.sections = tab.sections.map((oldSection, index) => {
+            return index === sectionIndex ? section : oldSection;
+        });
+
+        return tab;
     }
 }
