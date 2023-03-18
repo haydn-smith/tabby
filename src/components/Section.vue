@@ -38,7 +38,7 @@ const onNoteSelected = (string: number, active: boolean, index: number) => {
   <div class="mb-6">
     <div class="mb-1 font-normal text-md">{{ section.name }}</div>
 
-    <div class="flex font-mono text-sm leading-none">
+    <div class="flex font-mono text-md leading-none">
       <div>
         <div>e</div>
         <div>B</div>
@@ -64,7 +64,7 @@ const onNoteSelected = (string: number, active: boolean, index: number) => {
         <div>-</div>
       </div>
 
-      <div v-for="column, index in section.columns" :key="index">
+      <div v-for="column, index in section.columns" :key="Math.random()">
         <ColumnComponent @note-selected="(string, active) => onNoteSelected(string, active, index)" @column-changed="column => onColumnChanged(column, index)" :is-selected="isSelected && cursorPosition.column === index" :cursor-position="cursorPosition" :column="column"/>
       </div>
 

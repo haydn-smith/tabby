@@ -6,6 +6,10 @@ module.exports = {
   ],
   theme: {
     extend: {},
+    fontFamily: {
+      'sans': ['Lato', 'sans-serif'],
+      'mono': ['Ubuntu Mono', 'monospace']
+    }
   },
   plugins: [],
 }
