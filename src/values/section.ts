@@ -47,4 +47,12 @@ export default class Section {
 
     return section;
   }
+
+  public updateName(name: string): Section {
+    const section = Section.makeFromSection(this);
+
+    section.name = name;
+
+    return section;
+  }
 }

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import Button from './components/Button.vue';
-import Input from './components/Input.vue';
-import Modal from './components/Modal.vue';
-import SectionComponent from './components/Section.vue';
+import TabbyButton from './components/TabbyButton.vue';
+import TabbyInput from './components/TabbyInput.vue';
+import TabbyModal from './components/TabbyModal.vue';
+import TabbySection from './components/TabbySection.vue';
 import Cursor from './values/cursor';
 import Section from './values/section';
 import Tab from './values/tab';
@@ -44,15 +44,15 @@ const onNoteSelected = (string: number, column: number, section: number, active:
   <div class="relative h-screen w-screen overflow-hidden bg-gray-100 p-6">
     <div class="mb-8 flex items-center text-lg font-bold">
       <div class="mr-4">{{ tab.name }}</div>
-      <Button @click="tabSettingsOpen = true" text="Tab Settings" />
+      <TabbyButton @click="tabSettingsOpen = true" text="Tab Settings" />
     </div>
 
-    <Modal title="Tab Settings" v-model="tabSettingsOpen">
-      <Input label="Tab Name" placeholder="e.g. I Miss You by Blink 182" v-model="tab.name" />
-    </Modal>
+    <TabbyModal title="Tab Settings" v-model="tabSettingsOpen">
+      <TabbyInput label="Tab Name" placeholder="e.g. I Miss You by Blink 182" v-model="tab.name" />
+    </TabbyModal>
 
     <div v-for="(section, index) in tab.sections" :key="index" v-memo="[cursor.sectionMemoKey(index)]">
-      <SectionComponent
+      <TabbySection
         @note-selected="(string, active, column) => onNoteSelected(string, column, index, active)"
         @section-changed="(section) => onSectionChanged(index, section)"
         :cursor="cursor"
@@ -61,6 +61,6 @@ const onNoteSelected = (string: number, column: number, section: number, active:
       />
     </div>
 
-    <Button @click="tab = tab.addSection()" text="Add Section" />
+    <TabbyButton @click="tab = tab.addSection()" text="Add Section" />
   </div>
 </template>

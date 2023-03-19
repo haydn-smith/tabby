@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Column from '../values/column';
 import Cursor from '../values/cursor';
-import NoteComponent from './Note.vue';
+import TabbyNote from './TabbyNote.vue';
 
 const props = defineProps<{
   column: Column;
@@ -26,7 +26,7 @@ const onNoteSelected = (string: number, active: boolean) => {
 <template>
   <div :class="{ 'text-blue-400': !column, 'bg-blue-100': isSelected }">
     <div v-for="string in column.getStrings()" :key="string">
-      <NoteComponent
+      <TabbyNote
         @note-selected="(active) => onNoteSelected(string, active)"
         @note-changed="(fret) => onNoteChanged(string, fret)"
         :width="column.getCharacterWidth()"

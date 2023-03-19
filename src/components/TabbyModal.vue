@@ -1,6 +1,26 @@
+<script setup lang="ts">
+import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
+import TabbyButton from './TabbyButton.vue';
+
+defineProps<{
+  title: string;
+  modelValue: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: 'closed'): void;
+  (e: 'update:modelValue', modelValue: boolean): void;
+}>();
+
+const close = () => {
+  emit('update:modelValue', false);
+  emit('closed');
+};
+</script>
+
 <template>
   <TransitionRoot as="template" :show="modelValue">
-    <Dialog as="div" class="relative z-10" @close="$emit('update:modelValue', false)">
+    <Dialog as="div" class="relative z-10" @close="close">
       <TransitionChild
         as="template"
         enter="ease-out duration-300"
@@ -28,9 +48,6 @@
               class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6"
             >
               <div>
-                <!-- <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100"> -->
-                <!--   <CheckIcon class="h-6 w-6 text-green-600" aria-hidden="true" /> -->
-                <!-- </div> -->
                 <div class="">
                   <DialogTitle as="h3" class="text-center text-base font-semibold leading-6 text-gray-900">{{
                     title
@@ -41,7 +58,7 @@
                 </div>
               </div>
               <div class="mt-5 text-center sm:mt-6">
-                <Button @click="$emit('update:modelValue', false)" text="Save and Close" />
+                <TabbyButton @click="close" text="Save and Close" />
               </div>
             </DialogPanel>
           </TransitionChild>
@@ -50,17 +67,3 @@
     </Dialog>
   </TransitionRoot>
 </template>
-
-<script setup lang="ts">
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import Button from './Button.vue';
-
-defineProps<{
-  title: string;
-  modelValue: boolean;
-}>();
-
-defineEmits<{
-  (e: 'update:modelValue', modelValue: boolean): void;
-}>();
-</script>

@@ -3,12 +3,10 @@ import { nextTick, ref, watch } from 'vue';
 import Column from '../values/column';
 import Cursor from '../values/cursor';
 import Section from '../values/section';
-import Button from './Button.vue';
-import ColumnComponent from './Column.vue';
-import Input from './Input.vue';
-import Modal from './Modal.vue';
-
-const sectionSettingsOpen = ref(false);
+import TabbyButton from './TabbyButton.vue';
+import TabbyColumn from './TabbyColumn.vue';
+import TabbyInput from './TabbyInput.vue';
+import TabbyModal from './TabbyModal.vue';
 
 const props = defineProps<{
   section: Section;
@@ -20,6 +18,9 @@ const emits = defineEmits<{
   (e: 'sectionChanged', section: Section): void;
   (e: 'noteSelected', string: number, active: boolean, index: number): void;
 }>();
+
+const sectionSettingsOpen = ref(false);
+const updatedName = ref(props.section.name);
 
 watch(
   () => props.cursor,
@@ -43,18 +44,22 @@ const createColumn = async (string: number, active: boolean) => {
 const onNoteSelected = (string: number, active: boolean, index: number) => {
   emits('noteSelected', string, active, index);
 };
+
+const onSettingsClosed = () => {
+  emits('sectionChanged', props.section.updateName(updatedName.value));
+};
 </script>
 
 <template>
   <div class="mb-6">
     <div class="text-md mb-4 flex items-center font-bold">
       <div class="mr-4">{{ section.name }}</div>
-      <Button @click="sectionSettingsOpen = true" text="Section Settings" />
+      <TabbyButton @click="sectionSettingsOpen = true" text="Section Settings" />
     </div>
 
-    <Modal title="Section Settings" v-model="sectionSettingsOpen">
-      <Input label="Section Name" placeholder="e.g. Verse 1" v-model="section.name" />
-    </Modal>
+    <TabbyModal title="Section Settings" @closed="onSettingsClosed" v-model="sectionSettingsOpen">
+      <TabbyInput label="Section Name" placeholder="e.g. Verse 1" v-model="updatedName" />
+    </TabbyModal>
 
     <div class="text-md flex font-mono font-bold leading-none text-gray-700">
       <div>
@@ -68,7 +73,7 @@ const onNoteSelected = (string: number, active: boolean, index: number) => {
       </div>
 
       <div v-for="(column, index) in section.columns" :key="column.id" v-memo="[cursor.columnMemoKey(index)]">
-        <ColumnComponent
+        <TabbyColumn
           @note-selected="(string, active) => onNoteSelected(string, active, index)"
           @column-changed="(column) => onColumnChanged(column, index)"
           :is-selected="isSelected && cursor.isCurrentColumn(index)"
