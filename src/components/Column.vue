@@ -32,7 +32,7 @@ const onNoteSelected = (string: number, active: boolean) => {
         @note-changed="fret => onNoteChanged(string, fret)"
         :width="column.getCharacterWidth()"
         :is-selected="isSelected && cursor.isCurrentString(string)"
-        :is-active="cursor.isActive()"
+        :is-active="isSelected && cursor.isCurrentString(string) && cursor.isActive()"
         :note="column.getNoteForString(string)" />
     </div>
   </div>

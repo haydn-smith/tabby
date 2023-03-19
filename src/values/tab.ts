@@ -9,7 +9,7 @@ export default class Tab {
     public sections: Array<Section> = [];
 
     public constructor() {
-        this.name = 'Tabby Tab!';
+        this.name = 'New Tab';
 
         this.arrangement = new Arrangement();
     }

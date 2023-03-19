@@ -1,4 +1,5 @@
 import { clamp } from "ramda";
+import { v1, v4 } from "uuid";
 import Section from "./section";
 import Tab from "./tab";
 
@@ -115,5 +116,21 @@ export default class Cursor {
 
     public isActive(): boolean {
         return this.active;
+    }
+
+    public sectionMemoKey(sectionIndex: number): string {
+        if (this.section === sectionIndex) {
+            return v1();
+        } else {
+            return 'Unchanged';
+        }
+    }
+
+    public columnMemoKey(columnIndex: number): string {
+        if (this.column === columnIndex) {
+            return v1();
+        } else {
+            return 'Unchanged';
+        }
     }
 }

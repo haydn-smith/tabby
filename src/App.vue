@@ -52,10 +52,10 @@ const onNoteSelected = (string: number, column: number, section: number, active:
     </div>
 
     <Modal title="Tab Settings" v-model="tabSettingsOpen">
-      <Input label="Tab Name" placeholder="Your Tabby Tab!" v-model="tab.name"/>
+      <Input label="Tab Name" placeholder="e.g. I Miss You by Blink 182" v-model="tab.name"/>
     </Modal>
 
-    <div v-for="section, index in tab.sections" :key="index">
+    <div v-for="section, index in tab.sections" :key="index" v-memo="[cursor.sectionMemoKey(index)]">
       <SectionComponent
         @note-selected="(string, active, column) => onNoteSelected(string, column, index, active)"
         @section-changed="section => onSectionChanged(index, section)"

@@ -64,7 +64,7 @@ const onNoteSelected = (string: number, active: boolean, index: number) => {
         <div v-for="tuning, index in section.getTuning()" :key="index">--</div>
       </div>
 
-      <div v-for="column, index in section.columns" :key="column.id">
+      <div v-for="column, index in section.columns" :key="column.id" v-memo="[cursor.columnMemoKey(index)]">
         <ColumnComponent
           @note-selected="(string, active) => onNoteSelected(string, active, index)"
           @column-changed="column => onColumnChanged(column, index)"

@@ -33,7 +33,7 @@ const selectNote = (active: boolean) => {
 watch(() => props.isActive, async () => {
   await nextTick();
 
-  if (props.isSelected && props.isActive) {
+  if (props.isActive) {
     inputRef.value?.focus();
   }
 });
@@ -42,6 +42,6 @@ watch(() => props.isActive, async () => {
 <template>
   <div @click="selectNote(true)" @keydown.enter="selectNote(true)" :class="{'bg-blue-300': isSelected}" class="cursor-pointer relative px-0 hover:bg-blue-200">
     <div>{{ note.paddedFret(width) }}-</div>
-    <input ref="inputRef" @blur="selectNote(false)" v-show="isSelected && isActive" v-model="modelValue" class="z-50 text-center focus:ring-0 w-full absolute inset-0 p-0 m-0 bg-white w-4 border-none rounded-none"/>
+    <input ref="inputRef" @blur="selectNote(false)" v-show="isActive" v-model="modelValue" class="z-50 text-center focus:ring-0 w-full absolute inset-0 p-0 m-0 bg-white w-4 border-none rounded-none"/>
   </div>
 </template>
