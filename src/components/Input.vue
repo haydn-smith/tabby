@@ -1,17 +1,19 @@
 <script setup lang="ts">
 defineProps<{
-  label: string,
-  placeholder: string,
-  modelValue: string,
+  label: string;
+  placeholder: string;
+  modelValue: string;
 }>();
 
 defineEmits<{
-  (e: 'update:modelValue', modelValue: string)
+  (e: 'update:modelValue', modelValue: string);
 }>();
 </script>
 
 <template>
-  <div class="rounded-md px-3 pt-2.5 pb-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-blue-400 transition">
+  <div
+    class="rounded-md px-3 pt-2.5 pb-1.5 shadow-sm ring-1 ring-inset ring-gray-300 transition focus-within:ring-2 focus-within:ring-blue-400"
+  >
     <label for="name" class="block text-xs font-medium text-gray-900">{{ label }}</label>
     <input
       :value="modelValue"

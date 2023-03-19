@@ -1,23 +1,19 @@
 <script setup lang="ts">
-import Panel from './components/Panel.vue'
-import Tab from './values/tab';
+import { onMounted, ref } from 'vue';
 import Button from './components/Button.vue';
-import SectionComponent from './components/Section.vue';
-import Modal from './components/Modal.vue';
 import Input from './components/Input.vue';
-import { onMounted, ref, watch } from 'vue';
-import Column from './values/column';
-import Note from './values/note';
-import Modifier from './enum/modifier';
-import Section from './values/section';
+import Modal from './components/Modal.vue';
+import SectionComponent from './components/Section.vue';
 import Cursor from './values/cursor';
+import Section from './values/section';
+import Tab from './values/tab';
 
 const tab = ref(new Tab());
 const cursor = ref(new Cursor());
 const tabSettingsOpen = ref(false);
 
 onMounted(() => {
-  document.addEventListener("keydown", (event: KeyboardEvent) => {
+  document.addEventListener('keydown', (event: KeyboardEvent) => {
     cursor.value = cursor.value
       .moveCursorFromKeyboardEvent(event)
       .moveCursorBetweenSections(tab.value)
@@ -34,7 +30,7 @@ onMounted(() => {
 
 const onSectionChanged = (sectionIndex: number, section: Section) => {
   tab.value = tab.value.setSection(section, sectionIndex);
-}
+};
 
 const onNoteSelected = (string: number, column: number, section: number, active: boolean) => {
   cursor.value = cursor.value
@@ -45,26 +41,26 @@ const onNoteSelected = (string: number, column: number, section: number, active:
 </script>
 
 <template>
-  <div class="relative p-6 bg-gray-100 w-screen h-screen overflow-hidden">
-    <div class="font-bold text-lg mb-8 flex items-center">
+  <div class="relative h-screen w-screen overflow-hidden bg-gray-100 p-6">
+    <div class="mb-8 flex items-center text-lg font-bold">
       <div class="mr-4">{{ tab.name }}</div>
-      <Button @click="tabSettingsOpen = true" text="Tab Settings"/>
+      <Button @click="tabSettingsOpen = true" text="Tab Settings" />
     </div>
 
     <Modal title="Tab Settings" v-model="tabSettingsOpen">
-      <Input label="Tab Name" placeholder="e.g. I Miss You by Blink 182" v-model="tab.name"/>
+      <Input label="Tab Name" placeholder="e.g. I Miss You by Blink 182" v-model="tab.name" />
     </Modal>
 
-    <div v-for="section, index in tab.sections" :key="index" v-memo="[cursor.sectionMemoKey(index)]">
+    <div v-for="(section, index) in tab.sections" :key="index" v-memo="[cursor.sectionMemoKey(index)]">
       <SectionComponent
         @note-selected="(string, active, column) => onNoteSelected(string, column, index, active)"
-        @section-changed="section => onSectionChanged(index, section)"
+        @section-changed="(section) => onSectionChanged(index, section)"
         :cursor="cursor"
         :is-selected="cursor.isCurrentSection(index)"
         :section="section"
-        />
+      />
     </div>
 
-    <Button @click="tab = tab.addSection()" text="Add Section"/>
+    <Button @click="tab = tab.addSection()" text="Add Section" />
   </div>
 </template>

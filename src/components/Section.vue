@@ -1,41 +1,44 @@
 <script setup lang="ts">
-import { nextTick, watch, ref } from 'vue';
-import Modal from './Modal.vue';
-import Button from './Button.vue';
-import Input from './Input.vue';
+import { nextTick, ref, watch } from 'vue';
 import Column from '../values/column';
 import Cursor from '../values/cursor';
 import Section from '../values/section';
+import Button from './Button.vue';
 import ColumnComponent from './Column.vue';
+import Input from './Input.vue';
+import Modal from './Modal.vue';
 
 const sectionSettingsOpen = ref(false);
 
 const props = defineProps<{
-  section: Section,
-  cursor: Cursor,
-  isSelected: boolean
+  section: Section;
+  cursor: Cursor;
+  isSelected: boolean;
 }>();
 
 const emits = defineEmits<{
-  (e: 'sectionChanged', section: Section): void
-  (e: 'noteSelected', string: number, active: boolean, index: number): void
+  (e: 'sectionChanged', section: Section): void;
+  (e: 'noteSelected', string: number, active: boolean, index: number): void;
 }>();
 
-watch(() => props.cursor, () => {
-  if (props.isSelected && props.cursor.isCurrentColumn(props.section.columns.length)) {
-   createColumn(props.cursor.currentString(), false);
+watch(
+  () => props.cursor,
+  () => {
+    if (props.isSelected && props.cursor.isCurrentColumn(props.section.columns.length)) {
+      createColumn(props.cursor.currentString(), false);
+    }
   }
-});
+);
 
 const onColumnChanged = (column: Column, columnIndex: number) => {
   emits('sectionChanged', props.section.setColumn(column, columnIndex));
-}
+};
 
 const createColumn = async (string: number, active: boolean) => {
   emits('sectionChanged', props.section.addColumn());
   await nextTick();
   emits('noteSelected', string, active, props.section.columns.length - 1);
-}
+};
 
 const onNoteSelected = (string: number, active: boolean, index: number) => {
   emits('noteSelected', string, active, index);
@@ -44,30 +47,30 @@ const onNoteSelected = (string: number, active: boolean, index: number) => {
 
 <template>
   <div class="mb-6">
-    <div class="font-bold text-md mb-4 flex items-center">
+    <div class="text-md mb-4 flex items-center font-bold">
       <div class="mr-4">{{ section.name }}</div>
-      <Button @click="sectionSettingsOpen = true" text="Section Settings"/>
+      <Button @click="sectionSettingsOpen = true" text="Section Settings" />
     </div>
 
     <Modal title="Section Settings" v-model="sectionSettingsOpen">
-      <Input label="Section Name" placeholder="e.g. Verse 1" v-model="section.name"/>
+      <Input label="Section Name" placeholder="e.g. Verse 1" v-model="section.name" />
     </Modal>
 
-    <div class="flex font-mono text-md leading-none font-bold text-gray-700">
+    <div class="text-md flex font-mono font-bold leading-none text-gray-700">
       <div>
-        <div v-for="tuning, index in section.getTuning()" :key="index">{{ tuning }}</div>
+        <div v-for="(tuning, index) in section.getTuning()" :key="index">{{ tuning }}</div>
       </div>
       <div>
-        <div v-for="tuning, index in section.getTuning()" :key="index">|</div>
+        <div v-for="(tuning, index) in section.getTuning()" :key="index">|</div>
       </div>
       <div>
-        <div v-for="tuning, index in section.getTuning()" :key="index">--</div>
+        <div v-for="(tuning, index) in section.getTuning()" :key="index">--</div>
       </div>
 
-      <div v-for="column, index in section.columns" :key="column.id" v-memo="[cursor.columnMemoKey(index)]">
+      <div v-for="(column, index) in section.columns" :key="column.id" v-memo="[cursor.columnMemoKey(index)]">
         <ColumnComponent
           @note-selected="(string, active) => onNoteSelected(string, active, index)"
-          @column-changed="column => onColumnChanged(column, index)"
+          @column-changed="(column) => onColumnChanged(column, index)"
           :is-selected="isSelected && cursor.isCurrentColumn(index)"
           :cursor="cursor"
           :column="column"
@@ -75,7 +78,14 @@ const onNoteSelected = (string: number, active: boolean, index: number) => {
       </div>
 
       <div>
-        <div v-for="tuning, index in section.getTuning()" :key="index" @click="createColumn(index + 1, true)" class="text-blue-400 hover:bg-blue-200 cursor-pointer">--</div>
+        <div
+          v-for="(tuning, index) in section.getTuning()"
+          :key="index"
+          @click="createColumn(index + 1, true)"
+          class="cursor-pointer text-blue-400 hover:bg-blue-200"
+        >
+          --
+        </div>
       </div>
     </div>
   </div>

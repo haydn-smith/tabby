@@ -1,21 +1,20 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref, watch } from 'vue';
 import Note from '../values/note';
-import Cursor from '../values/cursor';
 
 const props = defineProps<{
-  note: Note,
-  width: number
-  isSelected: boolean,
-  isActive: boolean,
+  note: Note;
+  width: number;
+  isSelected: boolean;
+  isActive: boolean;
 }>();
 
 const emits = defineEmits<{
-  (e: 'noteChanged', fret: string): void
-  (e: 'noteSelected', active: boolean): void
+  (e: 'noteChanged', fret: string): void;
+  (e: 'noteSelected', active: boolean): void;
 }>();
 
-const inputRef = ref<HTMLInputElement|null>(null);
+const inputRef = ref<HTMLInputElement | null>(null);
 const modelValue = ref('');
 
 onMounted(() => {
@@ -30,18 +29,32 @@ const selectNote = (active: boolean) => {
   emits('noteSelected', active);
 };
 
-watch(() => props.isActive, async () => {
-  await nextTick();
+watch(
+  () => props.isActive,
+  async () => {
+    await nextTick();
 
-  if (props.isActive) {
-    inputRef.value?.focus();
+    if (props.isActive) {
+      inputRef.value?.focus();
+    }
   }
-});
+);
 </script>
 
 <template>
-  <div @click="selectNote(true)" @keydown.enter="selectNote(true)" :class="{'bg-blue-300': isSelected}" class="cursor-pointer relative px-0 hover:bg-blue-200">
+  <div
+    @click="selectNote(true)"
+    @keydown.enter="selectNote(true)"
+    :class="{ 'bg-blue-300': isSelected }"
+    class="relative cursor-pointer px-0 hover:bg-blue-200"
+  >
     <div>{{ note.paddedFret(width) }}-</div>
-    <input ref="inputRef" @blur="selectNote(false)" v-show="isActive" v-model="modelValue" class="z-50 text-center focus:ring-0 w-full absolute inset-0 p-0 m-0 bg-white w-4 border-none rounded-none"/>
+    <input
+      ref="inputRef"
+      @blur="selectNote(false)"
+      v-show="isActive"
+      v-model="modelValue"
+      class="absolute inset-0 z-50 m-0 w-full w-4 rounded-none border-none bg-white p-0 text-center focus:ring-0"
+    />
   </div>
 </template>

@@ -1,3 +1,1 @@
-export default class Arrangement {
-
-}
+export default class Arrangement {}
