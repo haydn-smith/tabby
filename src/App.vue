@@ -15,6 +15,11 @@ const isReadOnly = ref(false);
 
 onMounted(() => {
   document.addEventListener('keydown', (event: KeyboardEvent) => {
+    // There are no key events in readonly mode.
+    if (isReadOnly.value) {
+      return;
+    }
+
     cursor.value = cursor.value
       .moveCursorFromKeyboardEvent(event)
       .moveCursorBetweenSections(tab.value)
@@ -22,7 +27,7 @@ onMounted(() => {
 
     // We stop this from happening so that using our cursor doesn't have
     // unintended side effects like clicking buttons.
-    if (!isReadOnly.value && ['Enter', 'Escape'].includes(event.key)) {
+    if (['Enter', 'Escape'].includes(event.key)) {
       event.stopPropagation();
       event.preventDefault();
     }

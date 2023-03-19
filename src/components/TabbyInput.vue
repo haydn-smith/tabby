@@ -17,7 +17,7 @@ defineEmits<{
     <label for="name" class="block text-xs font-medium text-gray-900">{{ label }}</label>
     <input
       :value="modelValue"
-      @input="$emit('update:modelValue', $event.target.value)"
+      @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       type="text"
       name="name"
       id="name"

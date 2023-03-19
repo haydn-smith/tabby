@@ -3,7 +3,7 @@ import { v1 } from 'uuid';
 import Tab from './tab';
 
 export default class Cursor {
-  public constructor(private active: boolean = false, private section = 0, private column = 0, private string = 1) {}
+  public constructor(public active: boolean = false, public section = 0, public column = 0, public string = 1) {}
 
   public moveCursor(section: number, column: number, string: number): Cursor {
     return new Cursor(this.active, section, column, string);
@@ -67,7 +67,7 @@ export default class Cursor {
     );
   }
 
-  private projectedSection(tab: Tab): number {
+  public projectedSection(tab: Tab): number {
     if (this.section < tab.sections.length - 1 && this.string > tab.getSection(this.section).getTuning().length) {
       return this.section + 1;
     }
@@ -79,7 +79,7 @@ export default class Cursor {
     return this.section;
   }
 
-  private projectedString(tab: Tab): number {
+  public projectedString(tab: Tab): number {
     if (this.section < tab.sections.length - 1 && this.string > tab.getSection(this.section).getTuning().length) {
       return 0;
     }
