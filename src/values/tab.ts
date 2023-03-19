@@ -1,17 +1,16 @@
-import Arrangement from './arrangement';
 import Section from './section';
 
 export default class Tab {
   public name: string;
 
-  public arrangement: Arrangement;
-
   public sections: Array<Section> = [];
 
   public constructor() {
     this.name = 'New Tab';
+  }
 
-    this.arrangement = new Arrangement();
+  public static make(): Tab {
+    return new Tab().addSection();
   }
 
   public static makeFromTab(tab: Tab): Tab {

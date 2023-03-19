@@ -3,11 +3,17 @@ import Column from '../values/column';
 import Cursor from '../values/cursor';
 import TabbyNote from './TabbyNote.vue';
 
-const props = defineProps<{
-  column: Column;
-  isSelected: boolean;
-  cursor: Cursor;
-}>();
+const props = withDefaults(
+  defineProps<{
+    column: Column;
+    isSelected: boolean;
+    cursor: Cursor;
+    isReadOnly?: boolean;
+  }>(),
+  {
+    isReadOnly: false,
+  }
+);
 
 const emits = defineEmits<{
   (e: 'columnChanged', column: Column): void;
@@ -24,7 +30,7 @@ const onNoteSelected = (string: number, active: boolean) => {
 </script>
 
 <template>
-  <div :class="{ 'text-blue-400': !column, 'bg-blue-100': isSelected }">
+  <div :class="{ 'text-blue-400': !column, 'bg-blue-100': isSelected && !isReadOnly }">
     <div v-for="string in column.getStrings()" :key="string">
       <TabbyNote
         @note-selected="(active) => onNoteSelected(string, active)"
@@ -32,6 +38,7 @@ const onNoteSelected = (string: number, active: boolean) => {
         :width="column.getCharacterWidth()"
         :is-selected="isSelected && cursor.isCurrentString(string)"
         :is-active="isSelected && cursor.isCurrentString(string) && cursor.isActive()"
+        :is-read-only="isReadOnly"
         :note="column.getNoteForString(string)"
       />
     </div>
