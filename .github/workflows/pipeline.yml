@@ -2,7 +2,7 @@ name: pipeline
 on:
   - push
 jobs:
-  publish:
+  build:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-20.04
     steps:
@@ -12,6 +12,39 @@ jobs:
           node-version: 16
       - run: npm ci
       - run: npm run build
-      - uses: JamesIves/github-pages-deploy-action@v4
+      - name: Archive artifact
+        shell: sh
+        if: runner.os == 'Linux'
+        run: |
+          chmod -c -R +rX "$INPUT_PATH" | while read line; do
+            echo "::warning title=Invalid file permissions automatically fixed::$line"
+          done
+          tar \
+            --dereference --hard-dereference \
+            --directory "$INPUT_PATH" \
+            -cvf "$RUNNER_TEMP/artifact.tar" \
+            --exclude=.git \
+            --exclude=.github \
+            .
+        env:
+          INPUT_PATH: "_site/"
+      - name: Upload artifact
+        uses: actions/upload-artifact@main
         with:
-          folder: dist
+          name: "github-pages"
+          path: ${{ runner.temp }}/artifact.tar
+          retention-days: 1
+
+  deploy:
+    needs: build
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
