@@ -27,7 +27,7 @@ jobs:
             --exclude=.github \
             .
         env:
-          INPUT_PATH: "_site/"
+          INPUT_PATH: "dist/"
       - name: Upload artifact
         uses: actions/upload-artifact@main
         with:
