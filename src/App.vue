@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import TabbyButton from './components/TabbyButton.vue';
 import TabbyInput from './components/TabbyInput.vue';
 import TabbyModal from './components/TabbyModal.vue';
@@ -12,6 +12,18 @@ const tab = ref(Tab.make());
 const cursor = ref(new Cursor());
 const tabSettingsOpen = ref(false);
 const isReadOnly = ref(false);
+
+watch(tab, (oldVal, newVal) => {
+  const asString = JSON.stringify(newVal);
+
+  const asBase64 = btoa(asString);
+
+  const domain = window.location.protocol + '//' + window.location.host + window.location.pathname;
+  const query = `?data=` + asBase64;
+  window.history.pushState({ path: domain + query }, '', domain + query);
+
+  console.log(asBase64);
+});
 
 onMounted(() => {
   document.addEventListener('keydown', (event: KeyboardEvent) => {
