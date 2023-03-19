@@ -3,6 +3,8 @@ import Panel from './components/Panel.vue'
 import Tab from './values/tab';
 import Button from './components/Button.vue';
 import SectionComponent from './components/Section.vue';
+import Modal from './components/Modal.vue';
+import Input from './components/Input.vue';
 import { onMounted, ref, watch } from 'vue';
 import Column from './values/column';
 import Note from './values/note';
@@ -12,6 +14,7 @@ import Cursor from './values/cursor';
 
 const tab = ref(new Tab());
 const cursor = ref(new Cursor());
+const tabSettingsOpen = ref(false);
 
 onMounted(() => {
   document.addEventListener("keydown", (event: KeyboardEvent) => {
@@ -43,7 +46,14 @@ const onNoteSelected = (string: number, column: number, section: number, active:
 
 <template>
   <div class="relative p-6 bg-gray-100 w-screen h-screen overflow-hidden">
-    <div class="font-bold text-lg mb-6">{{ tab.name }}</div>
+    <div class="font-bold text-lg mb-8 flex items-center">
+      <div class="mr-4">{{ tab.name }}</div>
+      <Button @click="tabSettingsOpen = true" text="Tab Settings"/>
+    </div>
+
+    <Modal title="Tab Settings" v-model="tabSettingsOpen">
+      <Input label="Tab Name" placeholder="Your Tabby Tab!" v-model="tab.name"/>
+    </Modal>
 
     <div v-for="section, index in tab.sections" :key="index">
       <SectionComponent
@@ -56,11 +66,5 @@ const onNoteSelected = (string: number, column: number, section: number, active:
     </div>
 
     <Button @click="tab = tab.addSection()" text="Add Section"/>
-
-    <div class="bottom-0 left-0 right-0 absolute m-6">
-      <Panel>
-        Hello there
-      </Panel>
-    </div>
   </div>
 </template>

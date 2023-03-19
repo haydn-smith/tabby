@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import { nextTick, watch } from 'vue';
+import { nextTick, watch, ref } from 'vue';
+import Modal from './Modal.vue';
+import Button from './Button.vue';
+import Input from './Input.vue';
 import Column from '../values/column';
 import Cursor from '../values/cursor';
 import Section from '../values/section';
 import ColumnComponent from './Column.vue';
+
+const sectionSettingsOpen = ref(false);
 
 const props = defineProps<{
   section: Section,
@@ -39,9 +44,16 @@ const onNoteSelected = (string: number, active: boolean, index: number) => {
 
 <template>
   <div class="mb-6">
-    <div class="mb-1 font-normal text-md">{{ section.name }}</div>
+    <div class="font-bold text-md mb-4 flex items-center">
+      <div class="mr-4">{{ section.name }}</div>
+      <Button @click="sectionSettingsOpen = true" text="Section Settings"/>
+    </div>
 
-    <div class="flex font-mono text-md leading-none">
+    <Modal title="Section Settings" v-model="sectionSettingsOpen">
+      <Input label="Section Name" placeholder="e.g. Verse 1" v-model="section.name"/>
+    </Modal>
+
+    <div class="flex font-mono text-md leading-none font-bold text-gray-700">
       <div>
         <div v-for="tuning, index in section.getTuning()" :key="index">{{ tuning }}</div>
       </div>

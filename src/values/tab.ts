@@ -17,6 +17,7 @@ export default class Tab {
     public static makeFromTab(tab: Tab): Tab {
         const newTab = new Tab();
 
+        newTab.name = tab.name;
         newTab.sections = tab.sections.map(section => Section.makeFromSection(section));
 
         return newTab;
