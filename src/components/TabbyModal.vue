@@ -49,7 +49,7 @@ const close = () => {
             >
               <div>
                 <div class="">
-                  <DialogTitle as="h3" class="text-center text-base font-semibold leading-6 text-gray-900">{{
+                  <DialogTitle as="h3" class="text-center text-base font-semibold leading-6 text-gray-700">{{
                     title
                   }}</DialogTitle>
                   <div class="mt-5 text-sm text-gray-500">

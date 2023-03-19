@@ -60,7 +60,7 @@ const onSettingsClosed = () => {
 </script>
 
 <template>
-  <div class="mb-6">
+  <div class="mb-6 text-gray-700">
     <div class="text-md mb-4 flex items-center font-bold">
       <div class="mr-4">{{ section.name }}</div>
       <TabbyButton

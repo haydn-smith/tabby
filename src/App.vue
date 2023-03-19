@@ -27,7 +27,7 @@ onMounted(() => {
 
     // We stop this from happening so that using our cursor doesn't have
     // unintended side effects like clicking buttons.
-    if (['Enter', 'Escape'].includes(event.key)) {
+    if (['Enter', 'Escape', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
       event.stopPropagation();
       event.preventDefault();
     }
@@ -47,41 +47,51 @@ const onNoteSelected = (string: number, column: number, section: number, active:
 </script>
 
 <template>
-  <div class="relative h-screen w-screen overflow-auto bg-gray-100 p-6">
-    <div class="mb-8 flex items-center text-lg font-bold">
-      <div class="mr-4">{{ tab.name }}</div>
-      <TabbyButton
-        v-if="!isReadOnly"
-        @click="
-          isReadOnly = true;
-          tabSettingsOpen = true;
-        "
-        text="Tab Settings"
-      />
-      <TabbyButton class="ml-1" @click="isReadOnly = !isReadOnly" :text="'Read Only: ' + (isReadOnly ? 'Yes' : 'No')" />
-    </div>
+  <div class="relative h-screen w-screen overflow-hidden bg-gray-100 text-gray-700">
+    <div class="h-full overflow-scroll p-6 pb-24">
+      <div class="mb-8 flex items-center text-lg font-bold">
+        <div class="mr-4">{{ tab.name }}</div>
+        <TabbyButton
+          v-if="!isReadOnly"
+          @click="
+            isReadOnly = true;
+            tabSettingsOpen = true;
+          "
+          text="Tab Settings"
+        />
+      </div>
 
-    <TabbyModal title="Tab Settings" @closed="isReadOnly = false" v-model="tabSettingsOpen">
-      <TabbyInput label="Tab Name" placeholder="e.g. I Miss You by Blink 182" v-model="tab.name" />
-    </TabbyModal>
+      <TabbyModal title="Tab Settings" @closed="isReadOnly = false" v-model="tabSettingsOpen">
+        <TabbyInput label="Tab Name" placeholder="e.g. I Miss You by Blink 182" v-model="tab.name" />
+      </TabbyModal>
+
+      <div
+        v-for="(section, index) in tab.sections"
+        :key="index"
+        v-memo="[cursor.sectionMemoKey(index), isReadOnly, section.name]"
+      >
+        <TabbySection
+          @note-selected="(string, active, column) => onNoteSelected(string, column, index, active)"
+          @section-changed="(section) => onSectionChanged(index, section)"
+          @settings-opened="isReadOnly = true"
+          @settings-closed="isReadOnly = false"
+          :cursor="cursor"
+          :is-selected="cursor.isCurrentSection(index)"
+          :is-read-only="isReadOnly"
+          :section="section"
+        />
+      </div>
+
+      <TabbyButton v-if="!isReadOnly" @click="tab = tab.addSection()" text="Add Section" />
+    </div>
 
     <div
-      v-for="(section, index) in tab.sections"
-      :key="index"
-      v-memo="[cursor.sectionMemoKey(index), isReadOnly, section.name]"
+      class="absolute bottom-0 left-0 right-0 flex justify-between border-t border-t-gray-300 bg-gray-100 p-6 text-sm"
     >
-      <TabbySection
-        @note-selected="(string, active, column) => onNoteSelected(string, column, index, active)"
-        @section-changed="(section) => onSectionChanged(index, section)"
-        @settings-opened="isReadOnly = true"
-        @settings-closed="isReadOnly = false"
-        :cursor="cursor"
-        :is-selected="cursor.isCurrentSection(index)"
-        :is-read-only="isReadOnly"
-        :section="section"
-      />
+      <TabbyButton @click="isReadOnly = !isReadOnly" :text="'Read Only: ' + (isReadOnly ? 'Yes' : 'No')" />
+      <div>
+        <a class="hover:underline" href="https://github.com/BadMojoVeryBad/tabby" target="_blank">View on GitHub</a>
+      </div>
     </div>
-
-    <TabbyButton v-if="!isReadOnly" @click="tab = tab.addSection()" text="Add Section" />
   </div>
 </template>
