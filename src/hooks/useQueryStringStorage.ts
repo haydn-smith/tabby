@@ -26,7 +26,9 @@ export default function useQueryStringStorage<T>(
       if (typeof serialised === 'string') {
         storedValue.value = deserialise(serialised);
       }
-    } catch {}
+    } catch {
+      // ...
+    }
   });
 
   return storedValue;
