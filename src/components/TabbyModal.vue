@@ -45,19 +45,21 @@ const close = () => {
             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <DialogPanel
-              class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6"
+              class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm"
             >
-              <div>
+              <DialogTitle
+                as="h3"
+                class="bg-gray-100 p-6 text-center text-base font-semibold leading-6 text-gray-700"
+                >{{ title }}</DialogTitle
+              >
+              <div class="p-6">
                 <div class="">
-                  <DialogTitle as="h3" class="text-center text-base font-semibold leading-6 text-gray-700">{{
-                    title
-                  }}</DialogTitle>
-                  <div class="mt-5 text-sm text-gray-500">
+                  <div class="text-sm text-gray-500">
                     <slot></slot>
                   </div>
                 </div>
               </div>
-              <div class="mt-5 text-center sm:mt-6">
+              <div class="bg-gray-100 p-6 text-center">
                 <TabbyButton @click="close" text="Save and Close" />
               </div>
             </DialogPanel>
