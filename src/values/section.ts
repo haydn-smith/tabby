@@ -27,10 +27,18 @@ export default class Section implements Serialisable {
     return newSection;
   }
 
-  public addColumn(): Section {
+  public addColumn(columnIndex: number): Section {
     const section = Section.makeFromSection(this);
 
-    section.columns.push(Column.make());
+    section.columns.splice(columnIndex, 0, Column.make());
+
+    return section;
+  }
+
+  public deleteColumn(columnIndex: number): Section {
+    const section = Section.makeFromSection(this);
+
+    section.columns.splice(columnIndex, 1);
 
     return section;
   }

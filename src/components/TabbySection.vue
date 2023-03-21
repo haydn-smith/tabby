@@ -43,8 +43,21 @@ const onColumnChanged = (column: Column, columnIndex: number) => {
   emits('sectionChanged', props.section.setColumn(column, columnIndex));
 };
 
+const onColumnDeleted = (columnIndex: number) => {
+  emits('sectionChanged', props.section.deleteColumn(columnIndex));
+};
+
+const insertColumnBefore = () => {
+  emits('sectionChanged', props.section.addColumn(props.cursor.column));
+  emits('noteSelected', props.cursor.string, false, props.cursor.column);
+};
+
+const insertColumnAfter = () => {
+  emits('sectionChanged', props.section.addColumn(props.cursor.column + 1));
+};
+
 const createColumn = async (string: number, active: boolean) => {
-  emits('sectionChanged', props.section.addColumn());
+  emits('sectionChanged', props.section.addColumn(props.section.columns.length));
   await nextTick();
   emits('noteSelected', string, active, props.section.columns.length - 1);
 };
@@ -96,6 +109,9 @@ const onSettingsClosed = () => {
         <TabbyColumn
           @note-selected="(string, active) => onNoteSelected(string, active, index)"
           @column-changed="(column) => onColumnChanged(column, index)"
+          @column-deleted="() => onColumnDeleted(index)"
+          @insert-column-before="insertColumnBefore"
+          @insert-column-after="insertColumnAfter"
           :is-selected="isSelected && cursor.isCurrentColumn(index)"
           :is-read-only="isReadOnly"
           :cursor="cursor"
