@@ -1,29 +1,19 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref } from 'vue';
 import TabbyButton from './components/TabbyButton.vue';
 import TabbyInput from './components/TabbyInput.vue';
 import TabbyModal from './components/TabbyModal.vue';
 import TabbySection from './components/TabbySection.vue';
+import useDownloader from './hooks/useDownloader';
 import Cursor from './values/cursor';
 import Section from './values/section';
 import Tab from './values/tab';
 
+const download = useDownloader();
 const tab = ref(Tab.make());
 const cursor = ref(new Cursor());
 const tabSettingsOpen = ref(false);
 const isReadOnly = ref(false);
-
-watch(tab, (oldVal, newVal) => {
-  const asString = JSON.stringify(newVal);
-
-  const asBase64 = btoa(asString);
-
-  const domain = window.location.protocol + '//' + window.location.host + window.location.pathname;
-  const query = `?data=` + asBase64;
-  window.history.pushState({ path: domain + query }, '', domain + query);
-
-  console.log(asBase64);
-});
 
 onMounted(() => {
   document.addEventListener('keydown', (event: KeyboardEvent) => {
@@ -56,6 +46,20 @@ const onNoteSelected = (string: number, column: number, section: number, active:
     .toggleActive(active)
     .moveCursorWithinSectionBounds(tab.value);
 };
+
+const onExportJsonClicked = () => {
+  download('tabby.json', JSON.stringify(tab.value.toJson(), undefined, 2));
+};
+
+const onExportTextClicked = () => {
+  download('tabby.txt', tab.value.toText());
+};
+
+const onFileUploaded = (text: string) => {
+  const json = JSON.parse(text);
+  tab.value = Tab.fromJson(json);
+  isReadOnly.value = false;
+};
 </script>
 
 <template>
@@ -75,6 +79,21 @@ const onNoteSelected = (string: number, column: number, section: number, active:
 
       <TabbyModal title="Tab Settings" @closed="isReadOnly = false" v-model="tabSettingsOpen">
         <TabbyInput label="Tab Name" placeholder="e.g. I Miss You by Blink 182" v-model="tab.name" />
+
+        <div class="mt-5 text-center text-base font-semibold leading-6 text-gray-700">Export</div>
+        <div class="text-center text-sm leading-6 text-gray-700">Export your guitar tab so you can use it later!</div>
+        <div class="mt-2 text-center">
+          <TabbyButton class="mr-1" text="Export as tabby.json" @click="onExportJsonClicked" />
+          <TabbyButton class="" text="Export as tabby.txt" @click="onExportTextClicked" />
+        </div>
+
+        <div class="mt-5 text-center text-base font-semibold leading-6 text-gray-700">Import</div>
+        <div class="text-center text-sm leading-6 text-gray-700">
+          Import your guitar tab from a <strong>tabby.json</strong> file.
+        </div>
+        <div class="mt-2 text-center">
+          <TabbyInput @file-changed="onFileUploaded" type="file" label="Import" />
+        </div>
       </TabbyModal>
 
       <div

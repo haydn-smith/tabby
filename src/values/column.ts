@@ -1,7 +1,8 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v1 } from 'uuid';
 import Note from './note';
+import Serialisable from './serialisable';
 
-export default class Column {
+export default class Column implements Serialisable {
   public id = '';
 
   public notes: Array<Note> = [];
@@ -9,7 +10,7 @@ export default class Column {
   public static make(): Column {
     const column = new Column();
 
-    column.id = uuidv4();
+    column.id = v1();
 
     // TODO: Dynamic string amount.
     [1, 2, 3, 4, 5, 6].forEach((string) => {
@@ -51,6 +52,23 @@ export default class Column {
     column.notes = column.notes.map((note) => {
       return note.string === string ? new Note(string, fret) : note;
     });
+
+    return column;
+  }
+
+  public toJson(): Record<string, unknown> {
+    return {
+      notes: this.notes.map((note) => note.toJson()),
+    };
+  }
+
+  public static fromJson(json: Record<string, unknown>): Column {
+    const column = new Column();
+    column.id = v1();
+
+    if (Array.isArray(json.notes)) {
+      json.notes.forEach((note) => column.notes.push(Note.fromJson(note)));
+    }
 
     return column;
   }

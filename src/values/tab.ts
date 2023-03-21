@@ -1,7 +1,10 @@
 import Section from './section';
+import Serialisable from './serialisable';
 
-export default class Tab {
+export default class Tab implements Serialisable {
   public name: string;
+
+  public readOnly = false;
 
   public sections: Array<Section> = [];
 
@@ -44,6 +47,28 @@ export default class Tab {
     tab.sections = tab.sections.map((oldSection, index) => {
       return index === sectionIndex ? section : oldSection;
     });
+
+    return tab;
+  }
+
+  public toJson(): Record<string, unknown> {
+    return {
+      name: this.name,
+      sections: this.sections.map((section) => section.toJson()),
+    };
+  }
+
+  public toText(): string {
+    return 'Work in progress, sorry!';
+  }
+
+  public static fromJson(json: Record<string, unknown>): Tab {
+    const tab = new Tab();
+
+    if (typeof json.name === 'string' && Array.isArray(json.sections)) {
+      tab.name = json.name;
+      json.sections.forEach((section) => tab.sections.push(Section.fromJson(section)));
+    }
 
     return tab;
   }
