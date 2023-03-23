@@ -1,12 +1,15 @@
 <script setup lang="ts">
+import { PlayIcon, StopIcon } from '@heroicons/vue/24/solid';
 import { nextTick, ref, watch } from 'vue';
 import Column from '../values/column';
 import Cursor from '../values/cursor';
+import Player from '../values/player';
 import Section from '../values/section';
 import TabbyButton from './TabbyButton.vue';
 import TabbyColumn from './TabbyColumn.vue';
 import TabbyInput from './TabbyInput.vue';
 import TabbyModal from './TabbyModal.vue';
+import TabbySlider from './TabbySlider.vue';
 
 const props = withDefaults(
   defineProps<{
@@ -29,6 +32,9 @@ const emits = defineEmits<{
 
 const sectionSettingsOpen = ref(false);
 const updatedName = ref(props.section.name);
+const bpm = ref(150);
+const isPlaying = ref(false);
+const player = new Player();
 
 watch(
   () => props.cursor,
@@ -70,6 +76,18 @@ const onSettingsClosed = () => {
   emits('sectionChanged', props.section.updateName(updatedName.value));
   emits('settingsClosed');
 };
+
+const onPlay = () => {
+  if (!isPlaying.value) {
+    isPlaying.value = true;
+    player.setBpm(bpm.value).playSection(props.section);
+  }
+};
+
+const onStop = () => {
+  isPlaying.value = false;
+  player.stop();
+};
 </script>
 
 <template>
@@ -83,7 +101,17 @@ const onSettingsClosed = () => {
           sectionSettingsOpen = true;
         "
         text="Section Settings"
+        class="mr-4"
       />
+      <div class="flex items-center">
+        <PlayIcon
+          @click="onPlay"
+          :class="{ 'text-red-400 hover:text-red-400': isPlaying }"
+          class="mr-2 h-4 w-4 cursor-pointer text-blue-400 transition hover:text-blue-500"
+        />
+        <StopIcon @click="onStop" class="h-4 w-4 cursor-pointer text-blue-400 transition hover:text-blue-500" />
+        <TabbySlider :min="50" :max="700" v-model="bpm" :disabled="isPlaying" class="ml-4 w-16" />
+      </div>
     </div>
 
     <TabbyModal title="Section Settings" @closed="onSettingsClosed" v-model="sectionSettingsOpen">
@@ -92,7 +120,7 @@ const onSettingsClosed = () => {
 
     <div class="text-md flex font-mono font-bold leading-none text-gray-700">
       <div>
-        <div v-for="(tuning, index) in section.getTuning()" :key="index">{{ tuning }}</div>
+        <div v-for="(tuning, index) in section.getTuning()" :key="index">{{ tuning.asString() }}</div>
       </div>
       <div>
         <div v-for="(tuning, index) in section.getTuning()" :key="index">|</div>
