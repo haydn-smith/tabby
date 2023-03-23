@@ -30,7 +30,7 @@ export default class Column implements Serialisable {
     return newColumn;
   }
 
-  public getNoteForString(string: number): Note {
+  public getNoteForString(string: number): Position {
     // TODO: Throw error on undefined.
     return this.notes.filter((note) => note.string === string)[0];
   }

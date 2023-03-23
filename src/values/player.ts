@@ -46,8 +46,8 @@ export default class Player {
   private playColumn(): void {
     Player.player.stop();
 
-    this.section.columns.at(this.pointer)?.notes.forEach((position) => {
-      if (position.isPlayable()) {
+    this.section?.columns.at(this.pointer)?.notes.forEach((position) => {
+      if (position.isPlayable() && this.section) {
         const note = Note.forFret(position.fretNumber(), this.section.rootNoteForString(position.string));
 
         if (note.isRealisticOctave()) {
@@ -65,7 +65,7 @@ export default class Player {
   private incrementPointer(): void {
     this.pointer++;
 
-    if (this.pointer >= this.section.columns.length) {
+    if (this.section && this.pointer >= this.section.columns.length) {
       this.pointer = 0;
     }
   }
