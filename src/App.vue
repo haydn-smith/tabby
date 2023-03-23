@@ -14,6 +14,7 @@ const tab = ref(Tab.make());
 const cursor = ref(new Cursor());
 const tabSettingsOpen = ref(false);
 const isReadOnly = ref(false);
+const isPlaying = ref(false);
 
 onMounted(() => {
   document.addEventListener('keydown', (event: KeyboardEvent) => {
@@ -74,6 +75,7 @@ const onFileUploaded = (text: string) => {
             tabSettingsOpen = true;
           "
           text="Tab Settings"
+          :disabled="isPlaying"
         />
       </div>
 
@@ -99,21 +101,24 @@ const onFileUploaded = (text: string) => {
       <div
         v-for="(section, index) in tab.sections"
         :key="index"
-        v-memo="[cursor.sectionMemoKey(index), isReadOnly, section.name]"
+        v-memo="[cursor.sectionMemoKey(index), isReadOnly, isPlaying, section.name]"
       >
         <TabbySection
           @note-selected="(string, active, column) => onNoteSelected(string, column, index, active)"
           @section-changed="(section) => onSectionChanged(index, section)"
           @settings-opened="isReadOnly = true"
           @settings-closed="isReadOnly = false"
+          @section-played="isPlaying = true"
+          @section-stopped="isPlaying = false"
           :cursor="cursor"
           :is-selected="cursor.isCurrentSection(index)"
           :is-read-only="isReadOnly"
+          :is-playing="isPlaying"
           :section="section"
         />
       </div>
 
-      <TabbyButton v-if="!isReadOnly" @click="tab = tab.addSection()" text="Add Section" />
+      <TabbyButton :disabled="isPlaying" v-if="!isReadOnly" @click="tab = tab.addSection()" text="Add Section" />
     </div>
 
     <div

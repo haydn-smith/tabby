@@ -17,9 +17,11 @@ const props = withDefaults(
     cursor: Cursor;
     isSelected: boolean;
     isReadOnly?: boolean;
+    isPlaying?: boolean;
   }>(),
   {
     isReadOnly: false,
+    isPlaying: false,
   }
 );
 
@@ -28,12 +30,13 @@ const emits = defineEmits<{
   (e: 'noteSelected', string: number, active: boolean, index: number): void;
   (e: 'settingsOpened'): void;
   (e: 'settingsClosed'): void;
+  (e: 'sectionPlayed'): void;
+  (e: 'sectionStopped'): void;
 }>();
 
 const sectionSettingsOpen = ref(false);
 const updatedName = ref(props.section.name);
 const bpm = ref(150);
-const isPlaying = ref(false);
 const player = new Player();
 
 watch(
@@ -78,15 +81,15 @@ const onSettingsClosed = () => {
 };
 
 const onPlay = () => {
-  if (!isPlaying.value) {
-    isPlaying.value = true;
+  if (!props.isPlaying) {
     player.setBpm(bpm.value).playSection(props.section);
+    emits('sectionPlayed');
   }
 };
 
 const onStop = () => {
-  isPlaying.value = false;
   player.stop();
+  emits('sectionStopped');
 };
 </script>
 
@@ -102,6 +105,7 @@ const onStop = () => {
         "
         text="Section Settings"
         class="mr-4"
+        :disabled="isPlaying"
       />
       <div class="flex items-center">
         <PlayIcon
@@ -132,7 +136,7 @@ const onStop = () => {
       <div
         v-for="(column, index) in section.columns"
         :key="column.id"
-        v-memo="[cursor.columnMemoKey(index), isReadOnly]"
+        v-memo="[cursor.columnMemoKey(index), isReadOnly, isPlaying]"
       >
         <TabbyColumn
           @note-selected="(string, active) => onNoteSelected(string, active, index)"
@@ -141,13 +145,13 @@ const onStop = () => {
           @insert-column-before="insertColumnBefore"
           @insert-column-after="insertColumnAfter"
           :is-selected="isSelected && cursor.isCurrentColumn(index)"
-          :is-read-only="isReadOnly"
+          :is-read-only="isReadOnly || isPlaying"
           :cursor="cursor"
           :column="column"
         />
       </div>
 
-      <div v-if="!isReadOnly">
+      <div v-if="!isReadOnly && !isPlaying">
         <div
           v-for="(tuning, index) in section.getTuning()"
           :key="index"

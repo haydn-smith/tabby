@@ -15,8 +15,6 @@ export default class Player {
 
   private pointer = 0;
 
-  private playing = false;
-
   public static async initialise() {
     Player.context = new AudioContext();
 
@@ -38,7 +36,6 @@ export default class Player {
 
     this.section = section;
     this.pointer = 0;
-    this.playing = true;
 
     this.interval = setInterval(() => {
       this.playColumn();
@@ -46,22 +43,21 @@ export default class Player {
     }, (60 / this.bpm) * 1000);
   }
 
-  private isPlaying(): boolean {
-    return this.playing;
-  }
-
   private playColumn(): void {
     Player.player.stop();
 
-    this.section.columns.at(this.pointer)?.notes.forEach((note) => {
-      if (note.isPlayable()) {
-        Player.player.play(Note.forFret(note.fretNumber(), this.section.rootNoteForString(note.string)).asString());
+    this.section.columns.at(this.pointer)?.notes.forEach((position) => {
+      if (position.isPlayable()) {
+        const note = Note.forFret(position.fretNumber(), this.section.rootNoteForString(position.string));
+
+        if (note.isRealisticOctave()) {
+          Player.player.play(note.asString());
+        }
       }
     });
   }
 
   public stop() {
-    this.playing = false;
     Player.player.stop();
     clearInterval(this.interval);
   }
