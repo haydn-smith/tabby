@@ -1,4 +1,6 @@
+import Semitone from '../enum/semitone';
 import Column from './column';
+import Note from './note';
 import Serialisable from './serialisable';
 
 export default class Section implements Serialisable {
@@ -43,8 +45,15 @@ export default class Section implements Serialisable {
     return section;
   }
 
-  public getTuning(): Array<string> {
-    return ['e', 'B', 'G', 'D', 'A', 'E'];
+  public getTuning(): Array<Note> {
+    return [
+      new Note(Semitone.E, 4),
+      new Note(Semitone.B, 3),
+      new Note(Semitone.G, 3),
+      new Note(Semitone.D, 3),
+      new Note(Semitone.A, 2),
+      new Note(Semitone.E, 2),
+    ];
   }
 
   public setColumn(column: Column, columnIndex: number): Section {
@@ -63,6 +72,16 @@ export default class Section implements Serialisable {
     section.name = name;
 
     return section;
+  }
+
+  public rootNoteForString(string: number): Note {
+    const note = this.getTuning().at(string - 1);
+
+    if (note !== undefined) {
+      return note;
+    }
+
+    throw new Error('No string at position ' + string);
   }
 
   public toJson(): Record<string, unknown> {

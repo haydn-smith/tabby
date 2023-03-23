@@ -1,11 +1,11 @@
 import { v1 } from 'uuid';
-import Note from './note';
+import Position from './position';
 import Serialisable from './serialisable';
 
 export default class Column implements Serialisable {
   public id = '';
 
-  public notes: Array<Note> = [];
+  public notes: Array<Position> = [];
 
   public static make(): Column {
     const column = new Column();
@@ -14,7 +14,7 @@ export default class Column implements Serialisable {
 
     // TODO: Dynamic string amount.
     [1, 2, 3, 4, 5, 6].forEach((string) => {
-      column.notes.push(new Note(string, ''));
+      column.notes.push(new Position(string, ''));
     });
 
     return column;
@@ -25,7 +25,7 @@ export default class Column implements Serialisable {
 
     newColumn.id = column.id;
 
-    newColumn.notes = column.notes.map((note) => new Note(note.string, note.fret));
+    newColumn.notes = column.notes.map((note) => new Position(note.string, note.fret));
 
     return newColumn;
   }
@@ -50,7 +50,7 @@ export default class Column implements Serialisable {
     const column = Column.makeFromColumn(this);
 
     column.notes = column.notes.map((note) => {
-      return note.string === string ? new Note(string, fret) : note;
+      return note.string === string ? new Position(string, fret) : note;
     });
 
     return column;
@@ -67,7 +67,7 @@ export default class Column implements Serialisable {
     column.id = v1();
 
     if (Array.isArray(json.notes)) {
-      json.notes.forEach((note) => column.notes.push(Note.fromJson(note)));
+      json.notes.forEach((note) => column.notes.push(Position.fromJson(note)));
     }
 
     return column;

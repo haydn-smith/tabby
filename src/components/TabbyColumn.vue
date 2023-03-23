@@ -2,7 +2,7 @@
 import { ArrowSmallLeftIcon, ArrowSmallRightIcon, XMarkIcon } from '@heroicons/vue/24/solid';
 import Column from '../values/column';
 import Cursor from '../values/cursor';
-import TabbyNote from './TabbyNote.vue';
+import TabbyPosition from './TabbyPosition.vue';
 
 const props = withDefaults(
   defineProps<{
@@ -40,7 +40,7 @@ const onDeleteClicked = () => {
 <template>
   <div class="relative" :class="{ 'text-blue-400': !column, 'bg-blue-100': isSelected && !isReadOnly }">
     <div v-for="string in column.getStrings()" :key="string">
-      <TabbyNote
+      <TabbyPosition
         @note-selected="(active) => onNoteSelected(string, active)"
         @note-changed="(fret) => onNoteChanged(string, fret)"
         :width="column.getCharacterWidth()"

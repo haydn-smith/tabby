@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref, watch } from 'vue';
-import Note from '../values/note';
+import Position from '../values/position';
 
 const props = withDefaults(
   defineProps<{
-    note: Note;
+    note: Position;
     width: number;
     isSelected: boolean;
     isActive: boolean;

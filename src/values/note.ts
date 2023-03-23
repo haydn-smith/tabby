@@ -1,27 +1,61 @@
-import { range } from 'ramda';
-import Serialisable from './serialisable';
+import Semitone from '../enum/semitone';
 
-export default class Note implements Serialisable {
-  public constructor(public string: number, public fret: string) {}
+export default class Note {
+  public constructor(private readonly semitone: Semitone, private readonly octave: number) {}
 
-  public paddedFret(width: number): string {
-    return range(0, width).reduce((acc, current) => {
-      return acc.charAt(current) ? acc : acc + '-';
-    }, this.fret);
+  public static forFret(fret: number, rootNote: Note) {
+    return rootNote.addSemitones(fret);
   }
 
-  public toJson(): Record<string, unknown> {
-    return {
-      string: this.string,
-      fret: this.fret,
-    };
-  }
+  public addSemitones(semitones: number): Note {
+    const octavesToAdd = Math.floor(semitones / 12);
+    const semitonesToAdd = Math.floor(semitones % 12);
+    const indexedSemitones = this.indexedSemitones().splice(this.indexedSemitones().indexOf(this.semitone));
 
-  public static fromJson(json: Record<string, unknown>): Note {
-    if (typeof json.string === 'number' && typeof json.fret === 'string') {
-      return new Note(json.string, json.fret);
+    if (
+      this.indexedSemitones().indexOf(this.semitone) < 12 &&
+      this.indexedSemitones().indexOf(this.semitone) + semitonesToAdd >= 12
+    ) {
+      return new Note(indexedSemitones[semitonesToAdd], this.octave + octavesToAdd + 1);
     }
 
-    throw new Error('Invalid Note() object encountered when converting from JSON!');
+    return new Note(indexedSemitones[semitonesToAdd], this.octave + octavesToAdd);
+  }
+
+  public isRealisticOctave(): boolean {
+    return this.octave >= 0 && this.octave <= 7;
+  }
+
+  public asString(): string {
+    return `${this.semitone.valueOf()}${this.octave}`;
+  }
+
+  private indexedSemitones(): Semitone[] {
+    return [
+      Semitone.C,
+      Semitone.CSharp,
+      Semitone.D,
+      Semitone.DSharp,
+      Semitone.E,
+      Semitone.F,
+      Semitone.FSharp,
+      Semitone.G,
+      Semitone.GSharp,
+      Semitone.A,
+      Semitone.ASharp,
+      Semitone.B,
+      Semitone.C,
+      Semitone.CSharp,
+      Semitone.D,
+      Semitone.DSharp,
+      Semitone.E,
+      Semitone.F,
+      Semitone.FSharp,
+      Semitone.G,
+      Semitone.GSharp,
+      Semitone.A,
+      Semitone.ASharp,
+      Semitone.B,
+    ];
   }
 }

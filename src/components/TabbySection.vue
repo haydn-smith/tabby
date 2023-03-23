@@ -1,12 +1,15 @@
 <script setup lang="ts">
+import { PlayIcon, StopIcon } from '@heroicons/vue/24/solid';
 import { nextTick, ref, watch } from 'vue';
 import Column from '../values/column';
 import Cursor from '../values/cursor';
+import Player from '../values/player';
 import Section from '../values/section';
 import TabbyButton from './TabbyButton.vue';
 import TabbyColumn from './TabbyColumn.vue';
 import TabbyInput from './TabbyInput.vue';
 import TabbyModal from './TabbyModal.vue';
+import TabbySlider from './TabbySlider.vue';
 
 const props = withDefaults(
   defineProps<{
@@ -14,9 +17,11 @@ const props = withDefaults(
     cursor: Cursor;
     isSelected: boolean;
     isReadOnly?: boolean;
+    isPlaying?: boolean;
   }>(),
   {
     isReadOnly: false,
+    isPlaying: false,
   }
 );
 
@@ -25,10 +30,14 @@ const emits = defineEmits<{
   (e: 'noteSelected', string: number, active: boolean, index: number): void;
   (e: 'settingsOpened'): void;
   (e: 'settingsClosed'): void;
+  (e: 'sectionPlayed'): void;
+  (e: 'sectionStopped'): void;
 }>();
 
 const sectionSettingsOpen = ref(false);
 const updatedName = ref(props.section.name);
+const bpm = ref(150);
+const player = new Player();
 
 watch(
   () => props.cursor,
@@ -70,6 +79,18 @@ const onSettingsClosed = () => {
   emits('sectionChanged', props.section.updateName(updatedName.value));
   emits('settingsClosed');
 };
+
+const onPlay = () => {
+  if (!props.isPlaying) {
+    player.setBpm(bpm.value).playSection(props.section);
+    emits('sectionPlayed');
+  }
+};
+
+const onStop = () => {
+  player.stop();
+  emits('sectionStopped');
+};
 </script>
 
 <template>
@@ -83,7 +104,18 @@ const onSettingsClosed = () => {
           sectionSettingsOpen = true;
         "
         text="Section Settings"
+        class="mr-4"
+        :disabled="isPlaying"
       />
+      <div class="flex items-center">
+        <PlayIcon
+          @click="onPlay"
+          :class="{ 'text-red-400 hover:text-red-400': isPlaying }"
+          class="mr-2 h-4 w-4 cursor-pointer text-blue-400 transition hover:text-blue-500"
+        />
+        <StopIcon @click="onStop" class="h-4 w-4 cursor-pointer text-blue-400 transition hover:text-blue-500" />
+        <TabbySlider :min="50" :max="700" v-model="bpm" :disabled="isPlaying" class="ml-4 w-16" />
+      </div>
     </div>
 
     <TabbyModal title="Section Settings" @closed="onSettingsClosed" v-model="sectionSettingsOpen">
@@ -92,7 +124,7 @@ const onSettingsClosed = () => {
 
     <div class="text-md flex font-mono font-bold leading-none text-gray-700">
       <div>
-        <div v-for="(tuning, index) in section.getTuning()" :key="index">{{ tuning }}</div>
+        <div v-for="(tuning, index) in section.getTuning()" :key="index">{{ tuning.asString() }}</div>
       </div>
       <div>
         <div v-for="(tuning, index) in section.getTuning()" :key="index">|</div>
@@ -104,7 +136,7 @@ const onSettingsClosed = () => {
       <div
         v-for="(column, index) in section.columns"
         :key="column.id"
-        v-memo="[cursor.columnMemoKey(index), isReadOnly]"
+        v-memo="[cursor.columnMemoKey(index), isReadOnly, isPlaying]"
       >
         <TabbyColumn
           @note-selected="(string, active) => onNoteSelected(string, active, index)"
@@ -113,13 +145,13 @@ const onSettingsClosed = () => {
           @insert-column-before="insertColumnBefore"
           @insert-column-after="insertColumnAfter"
           :is-selected="isSelected && cursor.isCurrentColumn(index)"
-          :is-read-only="isReadOnly"
+          :is-read-only="isReadOnly || isPlaying"
           :cursor="cursor"
           :column="column"
         />
       </div>
 
-      <div v-if="!isReadOnly">
+      <div v-if="!isReadOnly && !isPlaying">
         <div
           v-for="(tuning, index) in section.getTuning()"
           :key="index"
