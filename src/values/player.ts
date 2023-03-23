@@ -20,7 +20,7 @@ export default class Player {
 
     // The typedef for this API call is wrong.
     // @ts-ignore
-    Player.player = await Soundfont.instrument(this.context, '/electric-guitar.js');
+    Player.player = await Soundfont.instrument(this.context, import.meta.env.BASE_URL + 'electric-guitar.js');
   }
 
   public setBpm(bpm: number): this {
