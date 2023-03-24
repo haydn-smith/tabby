@@ -27,6 +27,7 @@ const props = withDefaults(
 
 const emits = defineEmits<{
   (e: 'sectionChanged', section: Section): void;
+  (e: 'sectionDeleted'): void;
   (e: 'noteSelected', string: number, active: boolean, index: number): void;
   (e: 'settingsOpened'): void;
   (e: 'settingsClosed'): void;
@@ -123,6 +124,11 @@ const onStop = () => {
 
     <TabbyModal title="Section Settings" @closed="onSettingsClosed" v-model="sectionSettingsOpen">
       <TabbyInput label="Section Name" placeholder="e.g. Verse 1" v-model="updatedName" />
+
+      <div class="mt-5 text-center text-base font-semibold leading-6 text-gray-700">Delete Section</div>
+      <div class="mt-2 text-center">
+        <TabbyButton @click="$emit('sectionDeleted')" is-dangerous text="Delete Section" />
+      </div>
     </TabbyModal>
 
     <div class="text-md flex font-mono font-bold leading-none text-gray-700">

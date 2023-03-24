@@ -41,6 +41,14 @@ export default class Tab implements Serialisable {
     return tab;
   }
 
+  public deleteSection(index: number): Tab {
+    const tab = Tab.makeFromTab(this);
+
+    tab.sections.splice(index, 1);
+
+    return tab;
+  }
+
   public setSection(section: Section, sectionIndex: number): Tab {
     const tab = Tab.makeFromTab(this);
 

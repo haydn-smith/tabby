@@ -42,6 +42,11 @@ const onSectionChanged = (sectionIndex: number, section: Section) => {
   tab.value = tab.value.setSection(section, sectionIndex);
 };
 
+const onSectionDeleted = (index: number) => {
+  tab.value = tab.value.deleteSection(index);
+  isDisabled.value = false;
+};
+
 const onNoteSelected = (string: number, column: number, section: number, active: boolean) => {
   cursor.value = cursor.value
     .moveCursor(section, column, string)
@@ -107,6 +112,7 @@ const onFileUploaded = (text: string) => {
         <TabbySection
           @note-selected="(string, active, column) => onNoteSelected(string, column, index, active)"
           @section-changed="(section) => onSectionChanged(index, section)"
+          @section-deleted="onSectionDeleted(index)"
           @settings-opened="isDisabled = true"
           @settings-closed="isDisabled = false"
           @section-played="isDisabled = true"
