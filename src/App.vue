@@ -14,15 +14,16 @@ const tab = ref(Tab.make());
 const cursor = ref(new Cursor());
 const tabSettingsOpen = ref(false);
 const isReadOnly = ref(false);
-const isPlaying = ref(false);
+const isDisabled = ref(false);
 
 onMounted(() => {
   document.addEventListener('keydown', (event: KeyboardEvent) => {
     // There are no key events in readonly mode.
-    if (isReadOnly.value) {
+    if (isReadOnly.value || isDisabled.value) {
       return;
     }
 
+    // Move the cursor based on the key that is pressed.
     cursor.value = cursor.value
       .moveCursorFromKeyboardEvent(event)
       .moveCursorBetweenSections(tab.value)
@@ -71,15 +72,15 @@ const onFileUploaded = (text: string) => {
         <TabbyButton
           v-if="!isReadOnly"
           @click="
-            isReadOnly = true;
+            isDisabled = true;
             tabSettingsOpen = true;
           "
           text="Tab Settings"
-          :disabled="isPlaying"
+          :disabled="isDisabled"
         />
       </div>
 
-      <TabbyModal title="Tab Settings" @closed="isReadOnly = false" v-model="tabSettingsOpen">
+      <TabbyModal title="Tab Settings" @closed="isDisabled = false" v-model="tabSettingsOpen">
         <TabbyInput label="Tab Name" placeholder="e.g. I Miss You by Blink 182" v-model="tab.name" />
 
         <div class="mt-5 text-center text-base font-semibold leading-6 text-gray-700">Export</div>
@@ -101,24 +102,24 @@ const onFileUploaded = (text: string) => {
       <div
         v-for="(section, index) in tab.sections"
         :key="index"
-        v-memo="[cursor.sectionMemoKey(index), isReadOnly, isPlaying, section.name]"
+        v-memo="[cursor.sectionMemoKey(index), isReadOnly, isDisabled, section.name]"
       >
         <TabbySection
           @note-selected="(string, active, column) => onNoteSelected(string, column, index, active)"
           @section-changed="(section) => onSectionChanged(index, section)"
-          @settings-opened="isReadOnly = true"
-          @settings-closed="isReadOnly = false"
-          @section-played="isPlaying = true"
-          @section-stopped="isPlaying = false"
+          @settings-opened="isDisabled = true"
+          @settings-closed="isDisabled = false"
+          @section-played="isDisabled = true"
+          @section-stopped="isDisabled = false"
           :cursor="cursor"
           :is-selected="cursor.isCurrentSection(index)"
           :is-read-only="isReadOnly"
-          :is-playing="isPlaying"
+          :is-disabled="isDisabled"
           :section="section"
         />
       </div>
 
-      <TabbyButton :disabled="isPlaying" v-if="!isReadOnly" @click="tab = tab.addSection()" text="Add Section" />
+      <TabbyButton :disabled="isDisabled" v-if="!isReadOnly" @click="tab = tab.addSection()" text="Add Section" />
     </div>
 
     <div

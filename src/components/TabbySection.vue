@@ -17,11 +17,11 @@ const props = withDefaults(
     cursor: Cursor;
     isSelected: boolean;
     isReadOnly?: boolean;
-    isPlaying?: boolean;
+    isDisabled?: boolean;
   }>(),
   {
     isReadOnly: false,
-    isPlaying: false,
+    isDisabled: false,
   }
 );
 
@@ -38,6 +38,7 @@ const sectionSettingsOpen = ref(false);
 const updatedName = ref(props.section.name);
 const bpm = ref(150);
 const player = new Player();
+const isPlaying = ref(false);
 
 watch(
   () => props.cursor,
@@ -81,13 +82,15 @@ const onSettingsClosed = () => {
 };
 
 const onPlay = () => {
-  if (!props.isPlaying) {
+  if (!props.isDisabled) {
+    isPlaying.value = true;
     player.setBpm(bpm.value).playSection(props.section);
     emits('sectionPlayed');
   }
 };
 
 const onStop = () => {
+  isPlaying.value = false;
   player.stop();
   emits('sectionStopped');
 };
@@ -105,7 +108,7 @@ const onStop = () => {
         "
         text="Section Settings"
         class="mr-4"
-        :disabled="isPlaying"
+        :disabled="isDisabled"
       />
       <div class="flex items-center">
         <PlayIcon
@@ -114,7 +117,7 @@ const onStop = () => {
           class="mr-2 h-4 w-4 cursor-pointer text-blue-400 transition hover:text-blue-500"
         />
         <StopIcon @click="onStop" class="h-4 w-4 cursor-pointer text-blue-400 transition hover:text-blue-500" />
-        <TabbySlider :min="50" :max="700" v-model="bpm" :disabled="isPlaying" class="ml-4 w-16" />
+        <TabbySlider :min="50" :max="700" v-model="bpm" :disabled="isDisabled" class="ml-4 w-16" />
       </div>
     </div>
 
@@ -136,7 +139,7 @@ const onStop = () => {
       <div
         v-for="(column, index) in section.columns"
         :key="column.id"
-        v-memo="[cursor.columnMemoKey(index), isReadOnly, isPlaying]"
+        v-memo="[cursor.columnMemoKey(index), isReadOnly, isDisabled]"
       >
         <TabbyColumn
           @note-selected="(string, active) => onNoteSelected(string, active, index)"
@@ -145,13 +148,13 @@ const onStop = () => {
           @insert-column-before="insertColumnBefore"
           @insert-column-after="insertColumnAfter"
           :is-selected="isSelected && cursor.isCurrentColumn(index)"
-          :is-read-only="isReadOnly || isPlaying"
+          :is-read-only="isReadOnly || isDisabled"
           :cursor="cursor"
           :column="column"
         />
       </div>
 
-      <div v-if="!isReadOnly && !isPlaying">
+      <div v-if="!isReadOnly && !isDisabled">
         <div
           v-for="(tuning, index) in section.getTuning()"
           :key="index"
