@@ -74,7 +74,7 @@ const onExportJsonClicked = () => {
 };
 
 const onExportTextClicked = () => {
-  download('tabby.txt', tab.value.toText());
+  download(tab.value.name + '.txt', tab.value.toText());
 };
 
 const onFileUploaded = (text: string) => {
