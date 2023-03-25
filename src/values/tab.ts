@@ -59,6 +59,8 @@ export default class Tab implements Serialisable {
   }
 
   public toText(): string {
-    return 'Work in progress, sorry!';
+    return `Tab Name: ${this.name}
+
+${this.sections.reduce((acc, section) => acc.concat(section.toText()), '')}`;
   }
 }

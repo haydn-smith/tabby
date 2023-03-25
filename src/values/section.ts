@@ -83,4 +83,20 @@ export default class Section implements Serialisable {
       columns: this.columns.map((column) => column.toJson()),
     };
   }
+
+  public toText(): string {
+    return `Section Name: ${this.name}
+${this.getTuning().reduce((acc, tuning, index) => {
+  return acc.concat(
+    tuning.asString(),
+    '|-',
+    this.columns.reduce(
+      (acc, column) => acc.concat('-', column.getStringPosition(index + 1).padFret(column.getCharacterWidth())),
+      ''
+    ),
+    '\n'
+  );
+}, '')}
+`;
+  }
 }
