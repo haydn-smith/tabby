@@ -7,6 +7,7 @@ export default defineConfig({
   plugins: [
     vue(),
     VitePluginRadar({
+      enableDev: true,
       analytics: {
         id: 'G-6BT0P40NLF',
       },
