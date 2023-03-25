@@ -5,18 +5,31 @@ import TabbyInput from './components/TabbyInput.vue';
 import TabbyModal from './components/TabbyModal.vue';
 import TabbySection from './components/TabbySection.vue';
 import useDownloader from './hooks/useDownloader';
+import useStorage from './hooks/useStorage';
+import template from './template.json';
 import Cursor from './values/cursor';
 import Section from './values/section';
 import Tab from './values/tab';
 
 const download = useDownloader();
-const tab = ref(Tab.create());
+const tab = useStorage(
+  'tab',
+  Tab.create(),
+  (value) => JSON.stringify(value.toJson()),
+  (string) => Tab.createFromJson(JSON.parse(string))
+);
 const cursor = ref(new Cursor());
 const tabSettingsOpen = ref(false);
+const welcomeOpen = ref(false);
 const isReadOnly = ref(false);
 const isDisabled = ref(false);
 
 onMounted(() => {
+  if (tab.value.isNew()) {
+    welcomeOpen.value = true;
+    isDisabled.value = true;
+  }
+
   document.addEventListener('keydown', (event: KeyboardEvent) => {
     // There are no key events in readonly mode.
     if (isReadOnly.value || isDisabled.value) {
@@ -66,6 +79,22 @@ const onFileUploaded = (text: string) => {
   const json = JSON.parse(text);
   tab.value = Tab.createFromJson(json);
   isReadOnly.value = false;
+  isDisabled.value = false;
+  tabSettingsOpen.value = false;
+  welcomeOpen.value = false;
+};
+
+const onStartFromTemplateClicked = () => {
+  tab.value = Tab.createFromJson(template);
+  isDisabled.value = false;
+  welcomeOpen.value = false;
+};
+
+const onStartFromBlankClicked = () => {
+  tab.value = Tab.create();
+  isDisabled.value = false;
+  welcomeOpen.value = false;
+  tabSettingsOpen.value = false;
 };
 </script>
 
@@ -101,6 +130,25 @@ const onFileUploaded = (text: string) => {
         </div>
         <div class="mt-2 text-center">
           <TabbyInput @file-changed="onFileUploaded" type="file" label="Import" />
+        </div>
+
+        <div class="mt-5 text-center text-base font-semibold leading-6 text-gray-700">Delete Tab</div>
+        <div class="mt-2 text-center">
+          <TabbyButton class="" text="Delete Tab" @click="onStartFromBlankClicked" />
+        </div>
+      </TabbyModal>
+
+      <TabbyModal title="Welcome to Tabby!" :no-footer="true" @closed="isDisabled = false" v-model="welcomeOpen">
+        <div class="mt-2 mb-4 flex justify-center">
+          <img class="h-12 w-12" src="/tabby/favicon.jpg" />
+        </div>
+        <div class="text-center text-sm leading-6 text-gray-700">
+          Tabby can be used to create, edit, play, and export Guitar tablature. Choose where to start:
+        </div>
+        <div class="mt-2 text-center">
+          <TabbyButton class="mr-1 mb-1" text="Start From a Template" @click="onStartFromTemplateClicked" />
+          <TabbyButton class="mr-1 mb-1" text="Start From a Blank Tab" @click="onStartFromBlankClicked" />
+          <TabbyInput class="mb-1" @file-changed="onFileUploaded" type="file" label="Import From .json" />
         </div>
       </TabbyModal>
 

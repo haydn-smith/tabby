@@ -19,6 +19,10 @@ export default class Tab implements Serialisable {
     throw new Error('Cannot create tab from json!');
   }
 
+  public isNew(): boolean {
+    return this.sections.length <= 1 && !this.sections.at(0)?.isPopulated();
+  }
+
   public getSection(index: number): Section {
     if (this.sections[index] === undefined) {
       throw new Error('Section does not exist!');

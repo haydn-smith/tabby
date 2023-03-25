@@ -52,7 +52,7 @@ export default class Column implements Serialisable {
 
   public toJson(): Record<string, unknown> {
     return {
-      notes: this.positions.map((note) => note.toJson()),
+      positions: this.positions.map((note) => note.toJson()),
     };
   }
 }

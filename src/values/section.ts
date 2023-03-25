@@ -21,6 +21,13 @@ export default class Section implements Serialisable {
     throw new Error('Cannot create tab section from json!');
   }
 
+  public isPopulated(): boolean {
+    return (
+      this.columns.filter((column) => column.positions.filter((position) => position.fret.length > 0).length > 0)
+        .length > 0
+    );
+  }
+
   public addColumn(index: number): Section {
     return new Section(this.name, [
       ...this.columns.slice(0, index + 1),
