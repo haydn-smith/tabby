@@ -56,7 +56,7 @@ watch(
     :class="{ 'bg-blue-300': isSelected && !isReadOnly, 'cursor-pointer hover:bg-blue-200': !isReadOnly }"
     class="relative"
   >
-    <div>{{ note.paddedFret(width) }}-</div>
+    <div>{{ note.padFret(width) }}-</div>
     <input
       ref="inputRef"
       @blur="selectNote(false)"

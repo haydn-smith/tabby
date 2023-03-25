@@ -23,13 +23,13 @@ export default class Player {
     Player.player = await Soundfont.instrument(this.context, import.meta.env.BASE_URL + 'electric-guitar.js');
   }
 
-  public setBpm(bpm: number): this {
+  public setBpm(bpm: number): Player {
     this.bpm = bpm;
 
     return this;
   }
 
-  public playSection(section: Section): void {
+  public playSection(section: Section): Player {
     if (!Player.player) {
       throw new Error('Soundfont player is not initialised!');
     }
@@ -41,14 +41,16 @@ export default class Player {
       this.playColumn();
       this.incrementPointer();
     }, (60 / this.bpm) * 1000);
+
+    return this;
   }
 
   private playColumn(): void {
     Player.player.stop();
 
-    this.section?.columns.at(this.pointer)?.notes.forEach((position) => {
+    this.section?.columns.at(this.pointer)?.positions.forEach((position) => {
       if (position.isPlayable() && this.section) {
-        const note = Note.forFret(position.fretNumber(), this.section.rootNoteForString(position.string));
+        const note = Note.forFret(position.fretNumber(), this.section.getRootNoteForString(position.string));
 
         if (note.isRealisticOctave()) {
           Player.player.play(note.asString());
@@ -58,6 +60,10 @@ export default class Player {
   }
 
   public stop() {
+    if (!Player.player) {
+      throw new Error('Soundfont player is not initialised!');
+    }
+
     Player.player.stop();
     clearInterval(this.interval);
   }

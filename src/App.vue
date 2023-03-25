@@ -10,7 +10,7 @@ import Section from './values/section';
 import Tab from './values/tab';
 
 const download = useDownloader();
-const tab = ref(Tab.make());
+const tab = ref(Tab.create());
 const cursor = ref(new Cursor());
 const tabSettingsOpen = ref(false);
 const isReadOnly = ref(false);
@@ -64,7 +64,7 @@ const onExportTextClicked = () => {
 
 const onFileUploaded = (text: string) => {
   const json = JSON.parse(text);
-  tab.value = Tab.fromJson(json);
+  tab.value = Tab.createFromJson(json);
   isReadOnly.value = false;
 };
 </script>

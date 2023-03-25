@@ -4,45 +4,36 @@ import Note from './note';
 import Serialisable from './serialisable';
 
 export default class Section implements Serialisable {
-  public name: string;
+  public constructor(public readonly name = 'New Tab Section', public readonly columns: Array<Column> = []) {}
 
-  public columns: Array<Column> = [];
-
-  public constructor() {
-    this.name = 'New Tab Section';
+  public static create(): Section {
+    return new Section('New Tab Section', [Column.create()]);
   }
 
-  public static make(): Section {
-    const section = new Section();
+  public static createFromJson(json: Record<string, unknown>): Section {
+    if (typeof json.name === 'string' && Array.isArray(json.columns)) {
+      return new Section(
+        json.name,
+        json.columns.map((column) => Column.createFromJson(column))
+      );
+    }
 
-    section.columns.push(Column.make());
-
-    return section;
+    throw new Error('Cannot create tab section from json!');
   }
 
-  public static makeFromSection(section: Section): Section {
-    const newSection = new Section();
-
-    newSection.name = section.name;
-    newSection.columns = section.columns.map((column) => Column.makeFromColumn(column));
-
-    return newSection;
+  public addColumn(index: number): Section {
+    return new Section(this.name, [
+      ...this.columns.slice(0, index + 1),
+      Column.create(),
+      ...this.columns.slice(index + 1),
+    ]);
   }
 
-  public addColumn(columnIndex: number): Section {
-    const section = Section.makeFromSection(this);
-
-    section.columns.splice(columnIndex, 0, Column.make());
-
-    return section;
-  }
-
-  public deleteColumn(columnIndex: number): Section {
-    const section = Section.makeFromSection(this);
-
-    section.columns.splice(columnIndex, 1);
-
-    return section;
+  public deleteColumn(index: number): Section {
+    return new Section(
+      this.name,
+      this.columns.filter((_, i) => i !== index)
+    );
   }
 
   public getTuning(): Array<Note> {
@@ -57,24 +48,19 @@ export default class Section implements Serialisable {
   }
 
   public setColumn(column: Column, columnIndex: number): Section {
-    const section = Section.makeFromSection(this);
-
-    section.columns = section.columns.map((oldColumn, index) => {
-      return index === columnIndex ? column : oldColumn;
-    });
-
-    return section;
+    return new Section(
+      this.name,
+      this.columns.map((oldColumn, index) => {
+        return index === columnIndex ? column : oldColumn;
+      })
+    );
   }
 
   public updateName(name: string): Section {
-    const section = Section.makeFromSection(this);
-
-    section.name = name;
-
-    return section;
+    return new Section(name, this.columns);
   }
 
-  public rootNoteForString(string: number): Note {
+  public getRootNoteForString(string: number): Note {
     const note = this.getTuning().at(string - 1);
 
     if (note !== undefined) {
@@ -89,16 +75,5 @@ export default class Section implements Serialisable {
       name: this.name,
       columns: this.columns.map((column) => column.toJson()),
     };
-  }
-
-  public static fromJson(json: Record<string, unknown>): Section {
-    const section = new Section();
-
-    if (typeof json.name === 'string' && Array.isArray(json.columns)) {
-      section.name = json.name;
-      json.columns.forEach((column) => section.columns.push(Column.fromJson(column)));
-    }
-
-    return section;
   }
 }

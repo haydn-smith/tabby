@@ -59,12 +59,12 @@ const onColumnDeleted = (columnIndex: number) => {
 };
 
 const insertColumnBefore = () => {
-  emits('sectionChanged', props.section.addColumn(props.cursor.column));
-  emits('noteSelected', props.cursor.string, false, props.cursor.column);
+  emits('sectionChanged', props.section.addColumn(props.cursor.column - 1));
+  emits('noteSelected', props.cursor.string, false, props.cursor.column + 1);
 };
 
 const insertColumnAfter = () => {
-  emits('sectionChanged', props.section.addColumn(props.cursor.column + 1));
+  emits('sectionChanged', props.section.addColumn(props.cursor.column));
 };
 
 const createColumn = async (string: number, active: boolean) => {

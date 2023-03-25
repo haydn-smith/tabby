@@ -2,27 +2,21 @@ import Section from './section';
 import Serialisable from './serialisable';
 
 export default class Tab implements Serialisable {
-  public name: string;
+  public constructor(public readonly name = 'New Tab', public readonly sections: Array<Section> = []) {}
 
-  public readOnly = false;
-
-  public sections: Array<Section> = [];
-
-  public constructor() {
-    this.name = 'New Tab';
-  }
-
-  public static make(): Tab {
+  public static create(): Tab {
     return new Tab().addSection();
   }
 
-  public static makeFromTab(tab: Tab): Tab {
-    const newTab = new Tab();
+  public static createFromJson(json: Record<string, unknown>): Tab {
+    if (typeof json.name === 'string' && Array.isArray(json.sections)) {
+      return new Tab(
+        json.name,
+        json.sections.map((section) => Section.createFromJson(section))
+      );
+    }
 
-    newTab.name = tab.name;
-    newTab.sections = tab.sections.map((section) => Section.makeFromSection(section));
-
-    return newTab;
+    throw new Error('Cannot create tab from json!');
   }
 
   public getSection(index: number): Section {
@@ -34,29 +28,23 @@ export default class Tab implements Serialisable {
   }
 
   public addSection(): Tab {
-    const tab = Tab.makeFromTab(this);
-
-    tab.sections.push(Section.make());
-
-    return tab;
+    return new Tab(this.name, [...this.sections, Section.create()]);
   }
 
   public deleteSection(index: number): Tab {
-    const tab = Tab.makeFromTab(this);
-
-    tab.sections.splice(index, 1);
-
-    return tab;
+    return new Tab(
+      this.name,
+      this.sections.filter((_, i) => i !== index)
+    );
   }
 
   public setSection(section: Section, sectionIndex: number): Tab {
-    const tab = Tab.makeFromTab(this);
-
-    tab.sections = tab.sections.map((oldSection, index) => {
-      return index === sectionIndex ? section : oldSection;
-    });
-
-    return tab;
+    return new Tab(
+      this.name,
+      this.sections.map((oldSection, index) => {
+        return index === sectionIndex ? section : oldSection;
+      })
+    );
   }
 
   public toJson(): Record<string, unknown> {
@@ -68,16 +56,5 @@ export default class Tab implements Serialisable {
 
   public toText(): string {
     return 'Work in progress, sorry!';
-  }
-
-  public static fromJson(json: Record<string, unknown>): Tab {
-    const tab = new Tab();
-
-    if (typeof json.name === 'string' && Array.isArray(json.sections)) {
-      tab.name = json.name;
-      json.sections.forEach((section) => tab.sections.push(Section.fromJson(section)));
-    }
-
-    return tab;
   }
 }
