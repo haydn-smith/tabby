@@ -91,9 +91,11 @@ const onPlay = () => {
 };
 
 const onStop = () => {
-  isPlaying.value = false;
-  player.stop();
-  emits('sectionStopped');
+  if (isPlaying.value) {
+    isPlaying.value = false;
+    player.stop();
+    emits('sectionStopped');
+  }
 };
 </script>
 
