@@ -47,7 +47,7 @@ const onDeleteClicked = () => {
         :is-selected="isSelected && cursor.isCurrentString(string)"
         :is-active="isSelected && cursor.isCurrentString(string) && cursor.isActive()"
         :is-read-only="isReadOnly"
-        :note="column.getNoteForString(string)"
+        :note="column.getStringPosition(string)"
       />
     </div>
     <div v-if="isSelected && !isReadOnly" class="absolute left-0 right-0 flex h-4">

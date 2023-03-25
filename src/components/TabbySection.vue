@@ -17,16 +17,17 @@ const props = withDefaults(
     cursor: Cursor;
     isSelected: boolean;
     isReadOnly?: boolean;
-    isPlaying?: boolean;
+    isDisabled?: boolean;
   }>(),
   {
     isReadOnly: false,
-    isPlaying: false,
+    isDisabled: false,
   }
 );
 
 const emits = defineEmits<{
   (e: 'sectionChanged', section: Section): void;
+  (e: 'sectionDeleted'): void;
   (e: 'noteSelected', string: number, active: boolean, index: number): void;
   (e: 'settingsOpened'): void;
   (e: 'settingsClosed'): void;
@@ -38,6 +39,7 @@ const sectionSettingsOpen = ref(false);
 const updatedName = ref(props.section.name);
 const bpm = ref(150);
 const player = new Player();
+const isPlaying = ref(false);
 
 watch(
   () => props.cursor,
@@ -57,12 +59,12 @@ const onColumnDeleted = (columnIndex: number) => {
 };
 
 const insertColumnBefore = () => {
-  emits('sectionChanged', props.section.addColumn(props.cursor.column));
-  emits('noteSelected', props.cursor.string, false, props.cursor.column);
+  emits('sectionChanged', props.section.addColumn(props.cursor.column - 1));
+  emits('noteSelected', props.cursor.string, false, props.cursor.column + 1);
 };
 
 const insertColumnAfter = () => {
-  emits('sectionChanged', props.section.addColumn(props.cursor.column + 1));
+  emits('sectionChanged', props.section.addColumn(props.cursor.column));
 };
 
 const createColumn = async (string: number, active: boolean) => {
@@ -81,13 +83,15 @@ const onSettingsClosed = () => {
 };
 
 const onPlay = () => {
-  if (!props.isPlaying) {
+  if (!props.isDisabled) {
+    isPlaying.value = true;
     player.setBpm(bpm.value).playSection(props.section);
     emits('sectionPlayed');
   }
 };
 
 const onStop = () => {
+  isPlaying.value = false;
   player.stop();
   emits('sectionStopped');
 };
@@ -105,7 +109,7 @@ const onStop = () => {
         "
         text="Section Settings"
         class="mr-4"
-        :disabled="isPlaying"
+        :disabled="isDisabled"
       />
       <div class="flex items-center">
         <PlayIcon
@@ -114,29 +118,35 @@ const onStop = () => {
           class="mr-2 h-4 w-4 cursor-pointer text-blue-400 transition hover:text-blue-500"
         />
         <StopIcon @click="onStop" class="h-4 w-4 cursor-pointer text-blue-400 transition hover:text-blue-500" />
-        <TabbySlider :min="50" :max="700" v-model="bpm" :disabled="isPlaying" class="ml-4 w-16" />
+        <TabbySlider :min="50" :max="700" v-model="bpm" :disabled="isDisabled" class="ml-4 w-16" />
       </div>
     </div>
 
     <TabbyModal title="Section Settings" @closed="onSettingsClosed" v-model="sectionSettingsOpen">
       <TabbyInput label="Section Name" placeholder="e.g. Verse 1" v-model="updatedName" />
+
+      <div class="mt-5 text-center text-base font-semibold leading-6 text-gray-700">Delete Section</div>
+      <div class="mt-2 text-center">
+        <TabbyButton @click="$emit('sectionDeleted')" is-dangerous text="Delete Section" />
+      </div>
     </TabbyModal>
 
-    <div class="text-md flex font-mono font-bold leading-none text-gray-700">
-      <div>
+    <div class="text-md flex whitespace-nowrap font-mono font-bold leading-none text-gray-700">
+      <div class="inline-block">
         <div v-for="(tuning, index) in section.getTuning()" :key="index">{{ tuning.asString() }}</div>
       </div>
-      <div>
+      <div class="inline-block">
         <div v-for="(tuning, index) in section.getTuning()" :key="index">|</div>
       </div>
-      <div>
+      <div class="inline-block">
         <div v-for="(tuning, index) in section.getTuning()" :key="index">--</div>
       </div>
 
       <div
+        class="inline-block"
         v-for="(column, index) in section.columns"
         :key="column.id"
-        v-memo="[cursor.columnMemoKey(index), isReadOnly, isPlaying]"
+        v-memo="[cursor.columnMemoKey(index), isReadOnly, isDisabled]"
       >
         <TabbyColumn
           @note-selected="(string, active) => onNoteSelected(string, active, index)"
@@ -145,13 +155,13 @@ const onStop = () => {
           @insert-column-before="insertColumnBefore"
           @insert-column-after="insertColumnAfter"
           :is-selected="isSelected && cursor.isCurrentColumn(index)"
-          :is-read-only="isReadOnly || isPlaying"
+          :is-read-only="isReadOnly || isDisabled"
           :cursor="cursor"
           :column="column"
         />
       </div>
 
-      <div v-if="!isReadOnly && !isPlaying">
+      <div v-if="!isReadOnly && !isDisabled">
         <div
           v-for="(tuning, index) in section.getTuning()"
           :key="index"

@@ -3,7 +3,12 @@ import { v1 } from 'uuid';
 import Tab from './tab';
 
 export default class Cursor {
-  public constructor(public active: boolean = false, public section = 0, public column = 0, public string = 1) {}
+  public constructor(
+    public readonly active: boolean = false,
+    public readonly section = 0,
+    public readonly column = 0,
+    public readonly string = 1
+  ) {}
 
   public moveCursor(section: number, column: number, string: number): Cursor {
     return new Cursor(this.active, section, column, string);

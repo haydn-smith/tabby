@@ -1,4 +1,3 @@
-import queryString from 'query-string';
 import { onMounted, ref, Ref, watch } from 'vue';
 
 export default function useQueryStringStorage<T>(
@@ -11,19 +10,14 @@ export default function useQueryStringStorage<T>(
 
   // Store on change.
   watch(storedValue, (newValue) => {
-    const domain = window.location.protocol + '//' + window.location.host + window.location.pathname;
-    const params = queryString.parse(location.search);
-    params[key] = serialise(newValue);
-    const query = `?${queryString.stringify(params)}`;
-    window.history.pushState({ path: domain + query }, '', domain + query);
+    localStorage.setItem(key, serialise(newValue));
   });
 
   // Hydrate on mount.
   onMounted(() => {
     try {
-      const params = queryString.parse(location.search);
-      const serialised = params[key];
-      if (typeof serialised === 'string') {
+      const serialised = localStorage.getItem(key);
+      if (serialised !== null) {
         storedValue.value = deserialise(serialised);
       }
     } catch {

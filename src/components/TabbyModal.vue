@@ -2,10 +2,16 @@
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import TabbyButton from './TabbyButton.vue';
 
-defineProps<{
-  title: string;
-  modelValue: boolean;
-}>();
+withDefaults(
+  defineProps<{
+    title: string;
+    noFooter?: boolean;
+    modelValue: boolean;
+  }>(),
+  {
+    noFooter: false,
+  }
+);
 
 const emit = defineEmits<{
   (e: 'closed'): void;
@@ -45,7 +51,7 @@ const close = () => {
             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <DialogPanel
-              class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm"
+              class="relative w-full transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:max-w-sm"
             >
               <DialogTitle
                 as="h3"
@@ -59,7 +65,7 @@ const close = () => {
                   </div>
                 </div>
               </div>
-              <div class="bg-gray-100 p-6 text-center">
+              <div v-if="!noFooter" class="bg-gray-100 p-6 text-center">
                 <TabbyButton @click="close" text="Save and Close" />
               </div>
             </DialogPanel>
