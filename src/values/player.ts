@@ -1,4 +1,4 @@
-import Soundfont from 'soundfont-player';
+import Soundfont, { InstrumentName } from 'soundfont-player';
 import Note from './note';
 import Section from './section';
 
@@ -19,8 +19,10 @@ export default class Player {
     Player.context = new AudioContext();
 
     // The typedef for this API call is wrong.
-    // @ts-ignore
-    Player.player = await Soundfont.instrument(this.context, import.meta.env.BASE_URL + 'electric-guitar.js');
+    Player.player = await Soundfont.instrument(
+      this.context,
+      (import.meta.env.BASE_URL + 'electric-guitar.js') as InstrumentName
+    );
   }
 
   public setBpm(bpm: number): Player {

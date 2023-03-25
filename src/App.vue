@@ -153,7 +153,7 @@ const onHelpClosed = () => {
 
         <TabbyModal title="Welcome to Tabby!" :no-footer="true" @closed="isDisabled = false" v-model="welcomeOpen">
           <div class="mt-2 mb-4 flex justify-center">
-            <img class="h-12 w-12" src="/tabby/favicon.jpg" />
+            <img class="h-12 w-12" src="/favicon.jpg" />
           </div>
           <div class="text-center text-sm leading-6 text-gray-700">
             Tabby can be used to create, edit, play, and export Guitar tablature. Choose where to start:
