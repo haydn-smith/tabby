@@ -70,7 +70,7 @@ const onNoteSelected = (string: number, column: number, section: number, active:
 };
 
 const onExportJsonClicked = () => {
-  download('tabby.json', JSON.stringify(tab.value.toJson(), undefined, 2));
+  download(tab.value.name + '.json', JSON.stringify(tab.value.toJson(), undefined, 2));
 };
 
 const onExportTextClicked = () => {
