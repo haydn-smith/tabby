@@ -3,7 +3,7 @@ An free, open source, online tool to create, edit, import, export, and play guit
 
 [https://badmojoverybad.github.io/tabby/](https://badmojoverybad.github.io/tabby/)
 
-![Preview of the guitar tab software.](https://github.com/BadMojoVeryBad/tabby/tree/main/public/preview.png)
+![Preview of the guitar tab software.](https://github.com/BadMojoVeryBad/tabby/blob/main/public/preview.png)
 
 # Development Installation
 ``` sh
