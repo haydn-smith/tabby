@@ -131,18 +131,19 @@ const onStop = () => {
       </div>
     </TabbyModal>
 
-    <div class="text-md flex font-mono font-bold leading-none text-gray-700">
-      <div>
+    <div class="text-md flex whitespace-nowrap font-mono font-bold leading-none text-gray-700">
+      <div class="inline-block">
         <div v-for="(tuning, index) in section.getTuning()" :key="index">{{ tuning.asString() }}</div>
       </div>
-      <div>
+      <div class="inline-block">
         <div v-for="(tuning, index) in section.getTuning()" :key="index">|</div>
       </div>
-      <div>
+      <div class="inline-block">
         <div v-for="(tuning, index) in section.getTuning()" :key="index">--</div>
       </div>
 
       <div
+        class="inline-block"
         v-for="(column, index) in section.columns"
         :key="column.id"
         v-memo="[cursor.columnMemoKey(index), isReadOnly, isDisabled]"
