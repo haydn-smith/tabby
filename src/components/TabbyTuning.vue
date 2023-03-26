@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import Note from '../values/note';
 import TabbyButton from './TabbyButton.vue';
 import TabbyModal from './TabbyModal.vue';
@@ -14,6 +14,13 @@ const emit = defineEmits<{
 }>();
 
 const newTuning = ref<Array<Note>>(props.tuning.map((note) => new Note(note.semitone, note.octave)));
+
+watch(
+  () => props.tuning,
+  () => {
+    newTuning.value = props.tuning.map((note) => new Note(note.semitone, note.octave));
+  }
+);
 
 const replaceNote = (note: Note, atIndex: number) => {
   newTuning.value = newTuning.value.map((n, index) => (index === atIndex ? note : n));

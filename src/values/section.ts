@@ -6,19 +6,21 @@ export default class Section implements Serialisable {
   public constructor(
     public readonly name = 'New Tab Section',
     public readonly columns: Array<Column> = [],
-    public readonly tuning: Note[]
+    public readonly tuning: Note[],
+    public readonly bpm: number = 150
   ) {}
 
   public static create(tuning: Note[]): Section {
     return new Section('New Tab Section', [Column.create(tuning)], tuning);
   }
 
-  public static createFromJson(json: Record<string, unknown>): Section {
-    if (typeof json.name === 'string' && Array.isArray(json.columns) && Array.isArray(json.tuning)) {
+  public static createFromJson(json: Record<string, unknown>, tuning: Note[]): Section {
+    if (typeof json.bpm === 'number' && typeof json.name === 'string' && Array.isArray(json.columns)) {
       return new Section(
         json.name,
-        json.columns.map((column) => Column.createFromJson(column)),
-        json.tuning.map((note) => Note.createFromJson(note))
+        json.columns.map((column) => Column.createFromJson(column, tuning)),
+        tuning,
+        json.bpm
       );
     }
 
@@ -36,15 +38,21 @@ export default class Section implements Serialisable {
     return new Section(
       this.name,
       this.columns.map((column) => column.setTuning(tuning)),
-      tuning
+      tuning,
+      this.bpm
     );
+  }
+
+  public setBpm(bpm: number): Section {
+    return new Section(this.name, this.columns, this.tuning, bpm);
   }
 
   public addColumn(index: number): Section {
     return new Section(
       this.name,
       [...this.columns.slice(0, index + 1), Column.create(this.tuning), ...this.columns.slice(index + 1)],
-      this.tuning
+      this.tuning,
+      this.bpm
     );
   }
 
@@ -52,7 +60,8 @@ export default class Section implements Serialisable {
     return new Section(
       this.name,
       this.columns.filter((_, i) => i !== index),
-      this.tuning
+      this.tuning,
+      this.bpm
     );
   }
 
@@ -62,12 +71,13 @@ export default class Section implements Serialisable {
       this.columns.map((oldColumn, index) => {
         return index === columnIndex ? column : oldColumn;
       }),
-      this.tuning
+      this.tuning,
+      this.bpm
     );
   }
 
   public updateName(name: string): Section {
-    return new Section(name, this.columns, this.tuning);
+    return new Section(name, this.columns, this.tuning, this.bpm);
   }
 
   public getRootNoteForString(string: number): Note {
@@ -84,7 +94,7 @@ export default class Section implements Serialisable {
     return {
       name: this.name,
       columns: this.columns.map((column) => column.toJson()),
-      tuning: this.tuning.map((note) => note.toJson()),
+      bpm: this.bpm,
     };
   }
 

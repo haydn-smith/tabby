@@ -37,7 +37,6 @@ const emits = defineEmits<{
 
 const sectionSettingsOpen = ref(false);
 const updatedName = ref(props.section.name);
-const bpm = ref(150);
 const player = new Player();
 const isPlaying = ref(false);
 
@@ -82,10 +81,14 @@ const onSettingsClosed = () => {
   emits('settingsClosed');
 };
 
+const onUpdateBpm = (bpm: number) => {
+  emits('sectionChanged', props.section.setBpm(bpm));
+};
+
 const onPlay = () => {
   if (!props.isDisabled) {
     isPlaying.value = true;
-    player.setBpm(bpm.value).playSection(props.section);
+    player.setBpm(props.section.bpm).playSection(props.section);
     emits('sectionPlayed');
   }
 };
@@ -120,15 +123,22 @@ const onStop = () => {
           class="mr-2 h-4 w-4 cursor-pointer text-blue-400 transition hover:text-blue-500"
         />
         <StopIcon @click="onStop" class="h-4 w-4 cursor-pointer text-blue-400 transition hover:text-blue-500" />
-        <TabbySlider :min="50" :max="700" v-model="bpm" :disabled="isDisabled" class="ml-4 w-16" />
+        <TabbySlider
+          :min="50"
+          :max="700"
+          :model-value="section.bpm"
+          @update:model-value="onUpdateBpm"
+          :disabled="isDisabled"
+          class="ml-4 w-16"
+        />
       </div>
     </div>
 
     <TabbyModal title="Section Settings" @closed="onSettingsClosed" v-model="sectionSettingsOpen">
       <TabbyInput label="Section Name" placeholder="e.g. Verse 1" v-model="updatedName" />
 
-      <div class="mt-5 text-center text-base font-semibold leading-6 text-gray-700">Delete Section</div>
-      <div class="mt-2 text-center">
+      <div class="mt-5 text-left text-base font-semibold leading-6 text-gray-700">Delete Section</div>
+      <div class="mt-2 text-left">
         <TabbyButton @click="$emit('sectionDeleted')" is-dangerous text="Delete Section" />
       </div>
     </TabbyModal>
@@ -148,7 +158,12 @@ const onStop = () => {
         class="inline-block"
         v-for="(column, index) in section.columns"
         :key="column.id"
-        v-memo="[cursor.columnMemoKey(index), isReadOnly, isDisabled]"
+        v-memo="[
+          column.getStrings().length,
+          cursor.columnMemoKey(index),
+          isReadOnly && cursor.column === index,
+          isDisabled && cursor.column === index,
+        ]"
       >
         <TabbyColumn
           @note-selected="(string, active) => onNoteSelected(string, active, index)"

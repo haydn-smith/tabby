@@ -49,7 +49,9 @@ onMounted(() => {
 
     // We stop this from happening so that using our cursor doesn't have
     // unintended side effects like clicking buttons.
-    if (['Enter', 'Escape', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
+    if (
+      ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Enter', 'Escape', 'ArrowUp', 'ArrowDown'].includes(event.key)
+    ) {
       event.stopPropagation();
       event.preventDefault();
     }
@@ -151,23 +153,23 @@ const onTuningChanged = (tuning: Note[]) => {
         <TabbyModal title="Tab Settings" @closed="isDisabled = false" v-model="tabSettingsOpen">
           <TabbyInput label="Tab Name" placeholder="e.g. I Miss You by Blink 182" v-model="tab.name" />
 
-          <div class="mt-5 text-center text-base font-semibold leading-6 text-gray-700">Export</div>
-          <div class="text-center text-sm leading-6 text-gray-700">Export your guitar tab so you can use it later!</div>
-          <div class="mt-2 text-center">
-            <TabbyButton class="mr-1" text="Export as tabby.json" @click="onExportJsonClicked" />
-            <TabbyButton class="" text="Export as tabby.txt" @click="onExportTextClicked" />
+          <div class="mt-5 text-left text-base font-semibold leading-6 text-gray-700">Export</div>
+          <div class="text-left text-sm leading-6 text-gray-700">Export your guitar tab so you can use it later!</div>
+          <div class="mt-2 text-left">
+            <TabbyButton class="mr-1" text="Export as .json" @click="onExportJsonClicked" />
+            <TabbyButton class="" text="Export as .txt" @click="onExportTextClicked" />
           </div>
 
-          <div class="mt-5 text-center text-base font-semibold leading-6 text-gray-700">Import</div>
-          <div class="text-center text-sm leading-6 text-gray-700">
-            Import your guitar tab from a <strong>tabby.json</strong> file.
+          <div class="mt-5 text-left text-base font-semibold leading-6 text-gray-700">Import</div>
+          <div class="text-left text-sm leading-6 text-gray-700">
+            Import your guitar tab from a <strong>.json</strong> file.
           </div>
-          <div class="mt-2 text-center">
+          <div class="mt-2 text-left">
             <TabbyInput @file-changed="onFileUploaded" type="file" label="Import" />
           </div>
 
-          <div class="mt-5 text-center text-base font-semibold leading-6 text-gray-700">Delete Tab</div>
-          <div class="mt-2 text-center">
+          <div class="mt-5 text-left text-base font-semibold leading-6 text-gray-700">Delete Tab</div>
+          <div class="mt-2 text-left">
             <TabbyButton class="" text="Delete Tab" @click="onStartFromBlankClicked" />
           </div>
         </TabbyModal>

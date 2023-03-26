@@ -21,7 +21,8 @@ export default function useQueryStringStorage<T>(
         storedValue.value = deserialise(serialised);
       }
     } catch {
-      // ...
+      // Whatever is in local storage is corrupt.
+      localStorage.removeItem(key);
     }
   });
 

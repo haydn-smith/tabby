@@ -18,12 +18,12 @@ export default class Column implements Serialisable {
     );
   }
 
-  public static createFromJson(json: Record<string, unknown>): Column {
-    if (Array.isArray(json.positions) && Array.isArray(json.tuning)) {
+  public static createFromJson(json: Record<string, unknown>, tuning: Note[]): Column {
+    if (Array.isArray(json.positions)) {
       return new Column(
         v1(),
         json.positions.map((position) => Position.createFromJson(position)),
-        json.tuning.map((note) => Note.createFromJson(note))
+        tuning
       );
     }
 
@@ -71,7 +71,6 @@ export default class Column implements Serialisable {
   public toJson(): Record<string, unknown> {
     return {
       positions: this.positions.map((note) => note.toJson()),
-      tuning: this.tuning.map((note) => note.toJson()),
     };
   }
 }

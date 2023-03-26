@@ -27,10 +27,11 @@ export default class Tab implements Serialisable {
 
   public static createFromJson(json: Record<string, unknown>): Tab {
     if (typeof json.name === 'string' && Array.isArray(json.sections) && Array.isArray(json.tuning)) {
+      const tuning = json.tuning.map((note) => Note.createFromJson(note));
       return new Tab(
         json.name,
-        json.sections.map((section) => Section.createFromJson(section)),
-        json.tuning.map((note) => Note.createFromJson(note))
+        json.sections.map((section) => Section.createFromJson(section, tuning)),
+        tuning
       );
     }
 
