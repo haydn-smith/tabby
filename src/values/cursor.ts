@@ -57,7 +57,7 @@ export default class Cursor {
       this.active,
       clamp(0, tab.sections.length - 1, this.section),
       clamp(0, tab.getSection(this.section).columns.length, this.column),
-      clamp(1, tab.getSection(this.section).getTuning().length, this.string)
+      clamp(1, tab.getSection(this.section).tuning.length, this.string)
     );
   }
 
@@ -73,7 +73,7 @@ export default class Cursor {
   }
 
   public projectedSection(tab: Tab): number {
-    if (this.section < tab.sections.length - 1 && this.string > tab.getSection(this.section).getTuning().length) {
+    if (this.section < tab.sections.length - 1 && this.string > tab.getSection(this.section).tuning.length) {
       return this.section + 1;
     }
 
@@ -85,12 +85,12 @@ export default class Cursor {
   }
 
   public projectedString(tab: Tab): number {
-    if (this.section < tab.sections.length - 1 && this.string > tab.getSection(this.section).getTuning().length) {
+    if (this.section < tab.sections.length - 1 && this.string > tab.getSection(this.section).tuning.length) {
       return 0;
     }
 
     if (this.section > 0 && this.string < 1) {
-      return tab.getSection(this.section - 1).getTuning().length;
+      return tab.getSection(this.section - 1).tuning.length;
     }
 
     return this.string;

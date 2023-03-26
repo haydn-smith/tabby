@@ -1,20 +1,24 @@
-import Semitone from '../enum/semitone';
 import Column from './column';
 import Note from './note';
 import Serialisable from './serialisable';
 
 export default class Section implements Serialisable {
-  public constructor(public readonly name = 'New Tab Section', public readonly columns: Array<Column> = []) {}
+  public constructor(
+    public readonly name = 'New Tab Section',
+    public readonly columns: Array<Column> = [],
+    public readonly tuning: Note[]
+  ) {}
 
-  public static create(): Section {
-    return new Section('New Tab Section', [Column.create()]);
+  public static create(tuning: Note[]): Section {
+    return new Section('New Tab Section', [Column.create(tuning)], tuning);
   }
 
   public static createFromJson(json: Record<string, unknown>): Section {
-    if (typeof json.name === 'string' && Array.isArray(json.columns)) {
+    if (typeof json.name === 'string' && Array.isArray(json.columns) && Array.isArray(json.tuning)) {
       return new Section(
         json.name,
-        json.columns.map((column) => Column.createFromJson(column))
+        json.columns.map((column) => Column.createFromJson(column)),
+        json.tuning.map((note) => Note.createFromJson(note))
       );
     }
 
@@ -28,30 +32,28 @@ export default class Section implements Serialisable {
     );
   }
 
+  public setTuning(tuning: Note[]): Section {
+    return new Section(
+      this.name,
+      this.columns.map((column) => column.setTuning(tuning)),
+      tuning
+    );
+  }
+
   public addColumn(index: number): Section {
-    return new Section(this.name, [
-      ...this.columns.slice(0, index + 1),
-      Column.create(),
-      ...this.columns.slice(index + 1),
-    ]);
+    return new Section(
+      this.name,
+      [...this.columns.slice(0, index + 1), Column.create(this.tuning), ...this.columns.slice(index + 1)],
+      this.tuning
+    );
   }
 
   public deleteColumn(index: number): Section {
     return new Section(
       this.name,
-      this.columns.filter((_, i) => i !== index)
+      this.columns.filter((_, i) => i !== index),
+      this.tuning
     );
-  }
-
-  public getTuning(): Array<Note> {
-    return [
-      new Note(Semitone.E, 4),
-      new Note(Semitone.B, 3),
-      new Note(Semitone.G, 3),
-      new Note(Semitone.D, 3),
-      new Note(Semitone.A, 2),
-      new Note(Semitone.E, 2),
-    ];
   }
 
   public setColumn(column: Column, columnIndex: number): Section {
@@ -59,16 +61,17 @@ export default class Section implements Serialisable {
       this.name,
       this.columns.map((oldColumn, index) => {
         return index === columnIndex ? column : oldColumn;
-      })
+      }),
+      this.tuning
     );
   }
 
   public updateName(name: string): Section {
-    return new Section(name, this.columns);
+    return new Section(name, this.columns, this.tuning);
   }
 
   public getRootNoteForString(string: number): Note {
-    const note = this.getTuning().at(string - 1);
+    const note = this.tuning.at(string - 1);
 
     if (note !== undefined) {
       return note;
@@ -81,12 +84,13 @@ export default class Section implements Serialisable {
     return {
       name: this.name,
       columns: this.columns.map((column) => column.toJson()),
+      tuning: this.tuning.map((note) => note.toJson()),
     };
   }
 
   public toText(): string {
     return `Section Name: ${this.name}
-${this.getTuning().reduce((acc, tuning, index) => {
+${this.tuning.reduce((acc, tuning, index) => {
   return acc.concat(
     tuning.asString(),
     '|-',

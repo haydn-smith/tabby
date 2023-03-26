@@ -1,26 +1,37 @@
 import { v1 } from 'uuid';
+import Note from './note';
 import Position from './position';
 import Serialisable from './serialisable';
 
 export default class Column implements Serialisable {
-  public constructor(public readonly id = v1(), public readonly positions: Array<Position> = []) {}
+  public constructor(
+    public readonly id = v1(),
+    public readonly positions: Array<Position> = [],
+    public readonly tuning: Note[]
+  ) {}
 
-  public static create(): Column {
+  public static create(tuning: Note[]): Column {
     return new Column(
       v1(),
-      [1, 2, 3, 4, 5, 6].map((string) => new Position(string, ''))
+      tuning.map((_, index) => new Position(index + 1, '')),
+      tuning
     );
   }
 
   public static createFromJson(json: Record<string, unknown>): Column {
-    if (Array.isArray(json.positions)) {
+    if (Array.isArray(json.positions) && Array.isArray(json.tuning)) {
       return new Column(
         v1(),
-        json.positions.map((position) => Position.createFromJson(position))
+        json.positions.map((position) => Position.createFromJson(position)),
+        json.tuning.map((note) => Note.createFromJson(note))
       );
     }
 
     throw new Error('Cannot create tab column from json!');
+  }
+
+  public getStrings(): number[] {
+    return this.tuning.map((_, i) => i + 1);
   }
 
   public getStringPosition(string: number): Position {
@@ -39,20 +50,28 @@ export default class Column implements Serialisable {
     }, 1);
   }
 
-  public getStrings(): Array<number> {
-    return [1, 2, 3, 4, 5, 6];
+  public setTuning(tuning: Note[]): Column {
+    return new Column(
+      this.id,
+      tuning.map((_, index) =>
+        this.positions.at(index) ? (this.positions.at(index) as Position) : new Position(index + 1, '')
+      ),
+      tuning
+    );
   }
 
   public setNote(string: number, fret: string): Column {
     return new Column(
       this.id,
-      this.positions.map((position) => (position.string === string ? new Position(string, fret) : position))
+      this.positions.map((position) => (position.string === string ? new Position(string, fret) : position)),
+      this.tuning
     );
   }
 
   public toJson(): Record<string, unknown> {
     return {
       positions: this.positions.map((note) => note.toJson()),
+      tuning: this.tuning.map((note) => note.toJson()),
     };
   }
 }

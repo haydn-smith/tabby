@@ -135,13 +135,13 @@ const onStop = () => {
 
     <div class="text-md flex whitespace-nowrap font-mono font-bold leading-none text-gray-700">
       <div class="inline-block">
-        <div v-for="(tuning, index) in section.getTuning()" :key="index">{{ tuning.asString() }}</div>
+        <div v-for="(tuning, index) in section.tuning" :key="index">{{ tuning.asString() }}</div>
       </div>
       <div class="inline-block">
-        <div v-for="(tuning, index) in section.getTuning()" :key="index">|</div>
+        <div v-for="(_, index) in section.tuning" :key="index">|</div>
       </div>
       <div class="inline-block">
-        <div v-for="(tuning, index) in section.getTuning()" :key="index">--</div>
+        <div v-for="(_, index) in section.tuning" :key="index">--</div>
       </div>
 
       <div
@@ -165,7 +165,7 @@ const onStop = () => {
 
       <div v-if="!isReadOnly && !isDisabled">
         <div
-          v-for="(tuning, index) in section.getTuning()"
+          v-for="(tuning, index) in section.tuning"
           :key="index"
           @click="createColumn(index + 1, true)"
           class="cursor-pointer text-blue-400 hover:bg-blue-200"

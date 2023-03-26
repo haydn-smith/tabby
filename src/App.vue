@@ -5,10 +5,12 @@ import TabbyButton from './components/TabbyButton.vue';
 import TabbyInput from './components/TabbyInput.vue';
 import TabbyModal from './components/TabbyModal.vue';
 import TabbySection from './components/TabbySection.vue';
+import TabbyTuning from './components/TabbyTuning.vue';
 import useDownloader from './hooks/useDownloader';
 import useStorage from './hooks/useStorage';
 import template from './template.json';
 import Cursor from './values/cursor';
+import Note from './values/note';
 import Section from './values/section';
 import Tab from './values/tab';
 
@@ -23,6 +25,7 @@ const cursor = ref(new Cursor());
 const tabSettingsOpen = ref(false);
 const welcomeOpen = ref(false);
 const helpOpen = ref(false);
+const tuningOpen = ref(false);
 const isReadOnly = ref(false);
 const isDisabled = ref(false);
 
@@ -108,6 +111,12 @@ const onHelpClosed = () => {
   helpOpen.value = false;
   isDisabled.value = false;
 };
+
+const onTuningChanged = (tuning: Note[]) => {
+  isDisabled.value = false;
+  tuningOpen.value = false;
+  tab.value = tab.value.setTuning(tuning);
+};
 </script>
 
 <template>
@@ -122,10 +131,22 @@ const onHelpClosed = () => {
               isDisabled = true;
               tabSettingsOpen = true;
             "
+            class="mr-1"
             text="Tab Settings"
             :disabled="isDisabled"
           />
+          <TabbyButton
+            v-if="!isReadOnly"
+            @click="
+              isDisabled = true;
+              tuningOpen = true;
+            "
+            text="Tuning Settings"
+            :disabled="isDisabled"
+          />
         </div>
+
+        <TabbyTuning :is-open="tuningOpen" @tuning-changed="onTuningChanged" :tuning="tab.tuning" />
 
         <TabbyModal title="Tab Settings" @closed="isDisabled = false" v-model="tabSettingsOpen">
           <TabbyInput label="Tab Name" placeholder="e.g. I Miss You by Blink 182" v-model="tab.name" />
