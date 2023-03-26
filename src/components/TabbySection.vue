@@ -139,7 +139,14 @@ const onStop = () => {
 
       <div class="mt-5 text-left text-base font-semibold leading-6 text-gray-700">Delete Section</div>
       <div class="mt-2 text-left">
-        <TabbyButton @click="$emit('sectionDeleted')" is-dangerous text="Delete Section" />
+        <TabbyButton
+          @click="
+            sectionSettingsOpen = false;
+            $emit('sectionDeleted');
+          "
+          is-dangerous
+          text="Delete Section"
+        />
       </div>
     </TabbyModal>
 
