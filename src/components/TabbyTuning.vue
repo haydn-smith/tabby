@@ -10,7 +10,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'tuningChanged', tuning: Note[]);
+  (e: 'tuningChanged', tuning: Note[]): void;
 }>();
 
 const newTuning = ref<Array<Note>>(props.tuning.map((note) => new Note(note.semitone, note.octave)));
@@ -41,7 +41,11 @@ const onSave = () => {
       </div>
     </div>
     <div class="mt-5 text-left">
-      <div class="flex items-center" v-for="(note, index) in newTuning">
+      <div
+        class="flex items-center"
+        v-for="(note, index) in newTuning"
+        :key="`${note.semitone.valueOf()}${note.octave}${index}`"
+      >
         <div class="mr-1 mb-1 w-8 rounded bg-gray-200 px-2 py-1 text-center font-mono text-xs text-gray-700">
           {{ note.asString() }}
         </div>

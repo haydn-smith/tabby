@@ -64,7 +64,7 @@ export default class Note {
     };
   }
 
-  private indexedSemitones(): Semitone[] {
+  public indexedSemitones(): Semitone[] {
     return [
       Semitone.C,
       Semitone.CSharp,
